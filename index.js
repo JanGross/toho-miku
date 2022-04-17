@@ -1,0 +1,50 @@
+require("dotenv").config();
+const { Console } = require("console");
+const fs = require("fs");
+const {Client, Intents, Collection} = require("discord.js");
+const dbUtil = require("./util/db")
+
+const logger = new Console({
+    stdout: process.stdout,
+    stderr: process.stderr
+});
+const client = new Client({intents: [
+    Intents.FLAGS.GUILDS,
+    Intents.FLAGS.GUILD_MESSAGES,
+    Intents.FLAGS.GUILD_MEMBERS,
+    Intents.FLAGS.GUILD_PRESENCES
+]});
+
+const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));
+const commands = [];
+client.commands = new Collection();
+
+for (const file of commandFiles) {
+    const command = require(`./commands/${file}`);
+    commands.push(command.data.toJSON());
+    client.commands.set(command.data.name, command);
+    logger.log(`Registered command: ${command.data.name}`);
+}
+
+const eventFiles = fs.readdirSync("./events").filter(file => file.endsWith(".js"));
+for (const file of eventFiles) {
+    const event = require(`./events/${file}`);
+    
+    if (event.once) {
+        client.once(event.name, (...args) => event.execute(...args, commands));
+    } else {
+        client.on(event.name, (...args) => event.execute(...args, commands));
+    }
+    
+    logger.log(`Registered event: ${event.name}`);
+}
+
+logger.log("Connecting to database...");
+dbUtil.initDb();
+logger.log("Connected to database!");
+logger.log("Starting bot...");
+client.login(process.env.TOKEN);
+
+
+
+
