@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9")
-const { Guild } = require("../models");
+const { Guild, User } = require("../models");
 
 module.exports = {
     name: "interactionCreate",
@@ -29,6 +29,20 @@ module.exports = {
             });
 
         }
+        //check if the user exists in the database, if not tell him to use the /register command
+        let user = await User.findOne({
+            where: {
+                userID: interaction.member.id
+            }
+        });
+        if (!user && interaction.commandName !== "register") {
+            interaction.reply({
+                content: `You are not registered, use the /register command`,
+                ephemeral: false
+            });
+            return;
+        }
+        
         const command = interaction.client.commands.get(interaction.commandName);
 
         if (!command) return;
