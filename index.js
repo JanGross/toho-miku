@@ -39,10 +39,10 @@ for (const file of eventFiles) {
     logger.log(`Registered event: ${event.name}`);
 }
 
-logger.log("Connecting to database...");
-dbUtil.initDb();
-logger.log("Connected to database!");
-logger.log("Starting bot...");
+
+
+logger.log("Syncing database...");
+dbUtil.syncDb();
 client.login(process.env.TOKEN);
 
 

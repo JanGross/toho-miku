@@ -1,33 +1,20 @@
 require("dotenv").config();
-const mysql = require("mysql2/promise")
+const fs = require("fs");
+const db  = require("../models/index");
 
-let _db;
-
-async function connect() {
-    const host = process.env.NODE_ENV === "production" 
-    try {
-        const connection = await mysql.createConnection({
-            "host" : process.env.DB_HOST,
-            "port" : 3306,
-            "user" : process.env.DB_USERNAME,
-            "password" : process.env.DB_PASSWORD,
-            "database" : process.env.DB_DATABASE
-        });
-        _db = connection;
-    } catch (err) {
-        console.log(err);
-    }
-}   
-
-function initDb() {
-    connect();
-}
 
 function getDb() {
-    return _db;
+    return db;
+}
+
+
+//function to sync all database models
+async function syncDb() {
+    return await db.sequelize.sync();
+
 }
 
 module.exports = {
-    initDb,
-    getDb
+    getDb,
+    syncDb
 }
