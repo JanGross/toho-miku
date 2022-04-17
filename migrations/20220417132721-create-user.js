@@ -1,21 +1,21 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Guilds', {
+    await queryInterface.createTable('Users', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      guildID: {
+      userID: {
         type: Sequelize.STRING
       },
-      adminRoleID: {
-        type: Sequelize.STRING
+      banned: {
+        type: Sequelize.BOOLEAN
       },
-      owderID: {
-        type: Sequelize.STRING
+      registredAt: {
+        type: Sequelize.DATE
       },
       createdAt: {
         allowNull: false,
@@ -28,6 +28,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Guilds');
+    await queryInterface.dropTable('Users');
   }
 };
