@@ -39,8 +39,11 @@ Steal profile layout from Amaan
 with more customization
 
 ## Other
+Bug bounty: offer rewards for reporting. Maybe % of a users wealth to 
+
 Required
 - detailed card history
+- Drop simulator (mass simulate drops to evaluate rates)
 
 Leaderboards
  - All time
@@ -60,21 +63,45 @@ Each reward tier also grants XP
 ### Friends list  
 could be used for a "social feed" outlining friends shiny drops and purchases (availability and social proof)
 
-### referral system 
-after a referred friend collects 100 cards, both get gems
+# Stage 2 features
 
-### archievements as profile badges  
+## Marketplace
+put up card/trade offers 
+each offer has a 🎶 fee, setting the anchor for subsequent promotion fees (💎)
+each offer should timeout, making the marketplace part of the habit loop
+
+## Custom cards
+Introduce custom cards as a high tier reward.  
+Mark as custom, dont't allow trading. 
+Don't allow replicating existing cards?   
+How do we handle new packs colliding with existinc custom cards?
+ - Convert custom card into official shiny card
+ - Make custom cards very distinct
+
+## archievements as profile badges  
+
 - [50, 100, 500, 1000, 10k] Cards collected  
 - [100k, 500k, 1m] Notes spent total  
    - do not encourage saving
-   - players with low funds (notes) could be targeted by high item discounts with a higher chance of conversion   
+   - players with low funds (notes) could be targeted by high item discounts for a higher chance of conversion   
 
-- [100, 500, 1k] Trades completed (Limit trades per hour? Pay for trade limit reset)
+- [100, 500, 1k] Private Trades completed (Limit trades per hour? Pay for trade limit reset, higher fees than Marketplace)
+- [100, 500, 1k] Public Trades (Marketplace) completed
 
 - [7d,1m,6m,1y] Daily streak
-   - ties in to the social feed to apply pressure to friends to keep up
+   - ties in to the social feed to apply pressure to keep up
 
 - [10,50,100] Shinies present in collection
 - [5k, 10k, 100k] Bad/ok/good cards in collection (each q level separately)
    - Discourage converting cards to currency, purchase instead
 
+# Stage 3 features
+
+## referral system 
+after a referred friend collects 100 cards, both get gems  
+this moved to stage 3 or later to counter stagnation of user aquisition
+
+## Spotify and/or LastFM linking
+Depending on the discord presence availability we could use presence updates  
+or use the Spotify API directly.  
+Considering the instability of both the Spotify and LastFM APIs, we might need an alternative  
