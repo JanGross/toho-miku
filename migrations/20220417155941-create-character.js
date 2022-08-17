@@ -4,32 +4,41 @@ module.exports = {
     await queryInterface.createTable('Characters', {
       id: {
         allowNull: false,
-        autoIncrement: true,
+        autoIncrement: false,
         primaryKey: true,
         type: Sequelize.INTEGER
+      },
+      bandId: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'Bands',
+          key: 'id'
+        }
       },
       name: {
         type: Sequelize.STRING
       },
-      rarity: {
-        type: Sequelize.INTEGER
-      },
       description: {
-        type: Sequelize.STRING
+        type: Sequelize.TEXT
       },
       imageURL: {
         type: Sequelize.STRING
       },
-      imageHash: {
-        type: Sequelize.STRING
+      enabled: {
+        allowNull: false,
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
   },

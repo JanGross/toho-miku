@@ -10,9 +10,10 @@ module.exports = {
       },
       identifier: {
         allowNull: false,
-        type: Sequelize.STRING
+        type: Sequelize.STRING,
+        unique: true
       },
-      characterID: {
+      characterId: {
         allowNull: false,
         type: Sequelize.INTEGER,
         references: {
@@ -20,7 +21,11 @@ module.exports = {
           key: 'id'
         }
       },
-      ownerID: {
+      quality: {
+        allowNull: false,
+        type: Sequelize.INTEGER
+      },
+      userId: {
         type: Sequelize.INTEGER,
         allowNull: false,
         references: {
@@ -28,17 +33,27 @@ module.exports = {
           key: 'id'
         }
       },
+      imageHash: {
+        type: Sequelize.STRING
+      },
       enabled: {
         allowNull: false,
-        type: Sequelize.BOOLEAN
+        type: Sequelize.BOOLEAN,
+        defaultValue: true
+      },
+      printNr: {
+        allowNull: false,
+        type: Sequelize.INTEGER,
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
   },

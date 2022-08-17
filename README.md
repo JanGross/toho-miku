@@ -12,4 +12,5 @@ If ran outside the container, DB_HOST must be set to localhost or the container'
 
 ```bash
 $npx sequelize db:migrate
+$npx sequelize db:seed:all
 ``` 

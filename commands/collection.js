@@ -7,26 +7,19 @@ module.exports = {
             .setName("collection")
             .setDescription("List all cards in your collection"),
     async execute(interaction) {
-        //fetch the user given the userID
+        //fetch the user given the userID and include his cards
         const user = await User.findOne({
             where: {
-                userID: interaction.member.id
-            }
-        });
-
-        //fetch all cards give the user id
-        const cards = await Card.findAll({
-            where: {
-                ownerID: user.id
+                discordId: interaction.member.id
             },
-            include: [{
-                model: Character,
-                as: "character"
+            include: [{ 
+                model: Card, 
+                include: [Character] 
             }]
         });
 
         //if the user has no cards, tell him
-        if (cards.length === 0) {
+        if (user.Cards.length === 0) {
             interaction.reply({
                 content: "You have no cards in your collection",
                 ephemeral: true
@@ -36,8 +29,14 @@ module.exports = {
 
         //if the user has cards, list them
         let message = "";
-        for (let i = 0; i < cards.length; i++) {
-            message += `${cards[i].id} - ${cards[i].characterID} ${cards[i].character.name} \n`;
+        for (let i = 0; i < user.Cards.length; i++) {
+            message += `${user.Cards[i].id} - ${user.Cards[i].characterId} \n`;
+            message += `Identifier: ${user.Cards[i].identifier} \n`;
+            message += `Name: ${user.Cards[i].Character.name} \n`;
+            message += `Image: ${user.Cards[i].Character.imageURL} \n`;
+            message += `Quality: ${user.Cards[i].quality} \n`;
+            message += `Print number: ${user.Cards[i].printNr} \n`;
+            message += `------------------------ \n`;
         }
         interaction.reply({
             content: message,

@@ -10,7 +10,7 @@ module.exports = {
         let users = await User.findAll();
         let userList = "";
         for (let i = 0; i < users.length; i++) {
-            let username = await interaction.client.users.fetch(users[i].userID);
+            let username = await interaction.client.users.fetch(users[i].discordId);
             userList += `${username.username}#${username.discriminator}`;
         }
         if (userList === "") {

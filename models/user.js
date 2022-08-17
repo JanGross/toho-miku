@@ -11,12 +11,13 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      User.hasMany(models.Card);
     }
   }
   User.init({
-    userID: DataTypes.STRING,
-    banned: DataTypes.BOOLEAN,
-    registredAt: DataTypes.DATE
+    discordId: DataTypes.BIGINT,
+    active: DataTypes.INTEGER,
+    privacy: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'User',

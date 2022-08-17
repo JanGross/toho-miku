@@ -1,5 +1,6 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
 const { Card, User } = require("../models");
+const { customAlphabet } = require("nanoid");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -16,15 +17,25 @@ module.exports = {
         //get user id from database given the userID
         const user = await User.findOne({
             where: {
-                userID: interaction.member.id
+                discordId: interaction.member.id
             }
         });
 
         //create new card with the given character id, and the user id
+        const nanoid = customAlphabet('23456789ABCDEFGHJKLMNPRSTUVWXYZ',6); //Up to 887.503.681 
+        const identifier = nanoid();
+        const existingCharacterCount = await Card.count({
+            where: {
+                characterId: interaction.options.getInteger("id")
+            }
+        });
+
         const card = await Card.create({
-            characterID: interaction.options.getInteger("id"),
-            identifier: "00000",
-            ownerID: user.id,
+            characterId: interaction.options.getInteger("id"),
+            identifier: identifier,
+            quality: 1,
+            printNr: existingCharacterCount + 1,
+            userId: user.id
         });
 
         //reply with the new card id

@@ -34,6 +34,22 @@ Completed bands reward cosmetics and XP (scaled to band size)
 
 Band levels by collecting duplicates (?) as a long term hook
 
+### Guild - Single guild the bot has joined
+- int guildID 
+- int active | 0 inactive, 1 active, 2 banned/blocked
+- int adminRoleId | role can configure server specific bot options
+- date created
+- date updated
+
+### Core - Global bot settings
+- bool maintenance
+- int[] adminIDs
+
+### User
+- int userID
+- int active | 0 inactive, 1 active, 2 banned/blocked
+- int privacy | 0 public, 1 private
+
 ## Profile
 Steal profile layout from Amaan
 with more customization

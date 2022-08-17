@@ -1,26 +1,21 @@
 'use strict';
+
 module.exports = {
-  async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Users', {
+  async up (queryInterface, Sequelize) {
+    await queryInterface.createTable('Bot', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      discordId: {
-        type: Sequelize.BIGINT,
-        allowNull: false
-      },
-      active: {
-        type: Sequelize.INTEGER,
+      maintenance: {
+        type: Sequelize.BOOLEAN,
         allowNull: false,
-        defaultValue: 1
+        defaultValue: false
       },
-      privacy: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0
+      adminIDs: {
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -34,7 +29,8 @@ module.exports = {
       }
     });
   },
-  async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users');
+
+  async down (queryInterface, Sequelize) {
+    await queryInterface.dropTable('Bot');
   }
 };

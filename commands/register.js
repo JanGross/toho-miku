@@ -9,7 +9,7 @@ module.exports = {
     async execute(interaction) {
         let user = await User.findOne({
             where: {
-                userID: interaction.user.id
+                discordId: interaction.user.id
             }
         });
         if (user) {
@@ -19,9 +19,8 @@ module.exports = {
             });
         } else {
             await User.create({
-                userID: interaction.user.id,
-                banned: false,
-                registredAt: new Date()
+                discordId: interaction.user.id,
+                active: 1,
             });
             interaction.reply({
                 content: "You are now registered",

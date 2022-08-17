@@ -1,26 +1,26 @@
 'use strict';
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('Users', {
+    await queryInterface.createTable('Bands', {
       id: {
         allowNull: false,
-        autoIncrement: true,
+        autoIncrement: false,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      discordId: {
-        type: Sequelize.BIGINT,
-        allowNull: false
+      name: {
+        type: Sequelize.STRING
       },
-      active: {
-        type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 1
+      description: {
+        type: Sequelize.TEXT
       },
-      privacy: {
-        type: Sequelize.INTEGER,
+      imageURL: {
+        type: Sequelize.STRING
+      },
+      enabled: {
         allowNull: false,
-        defaultValue: 0
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
       },
       createdAt: {
         allowNull: false,
@@ -35,6 +35,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('Users');
+    await queryInterface.dropTable('Bands');
   }
 };

@@ -8,22 +8,27 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      guildID: {
-        type: Sequelize.STRING
+      guildId: {
+        type: Sequelize.BIGINT,
+        allowNull: false
       },
-      adminRoleID: {
-        type: Sequelize.STRING
+      adminRoleId: {
+        type: Sequelize.BIGINT,
       },
-      owderID: {
-        type: Sequelize.STRING
+      active: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 1
       },
       createdAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       },
       updatedAt: {
         allowNull: false,
-        type: Sequelize.DATE
+        type: Sequelize.DATE,
+        defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
       }
     });
   },

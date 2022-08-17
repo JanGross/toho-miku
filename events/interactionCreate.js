@@ -12,15 +12,16 @@ module.exports = {
         //check if guild exists in database
         let guildData = await Guild.findOne({
             where: {
-                guildID: guild.id
+                guildId: guild.id
             }
         });
 
         if (!guildData) {
             //create guild in database
             await Guild.create({
-                guildID: guild.id,
-                ownerID: guild.ownerId,
+                guildId: guild.id,
+                adminRoleId: null,
+                active: 1
             });
             //send guild registered message to the interations channel
             interaction.channel.send({
@@ -32,7 +33,7 @@ module.exports = {
         //check if the user exists in the database, if not tell him to use the /register command
         let user = await User.findOne({
             where: {
-                userID: interaction.member.id
+                discordId: interaction.member.id
             }
         });
         if (!user && interaction.commandName !== "register") {
@@ -52,8 +53,8 @@ module.exports = {
         } catch (err) {
             if (err) console.log(err);
             await interaction.reply({
-                content: "An error occured processing the command",
-                ephemeral: true
+                content: `An error occured processing the command :(\n \`\`\`${JSON.stringify(err, null, 2)}\`\`\``,
+                ephemeral: false
             });
         }
     }

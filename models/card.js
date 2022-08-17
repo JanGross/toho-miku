@@ -10,22 +10,18 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Card.belongsTo(models.Character, {
-        foreignKey: 'characterID',
-        as: 'character'
-      });
-      Card.belongsTo(models.User, {
-        foreignKey: 'ownerID',
-        key: 'userId',
-        as: 'owner'
-      });
+      Card.belongsTo(models.User);
+      Card.belongsTo(models.Character);
     }
   }
   Card.init({
-    ownerID: DataTypes.STRING,
     identifier: DataTypes.STRING,
-    characterID: DataTypes.INTEGER,
-    enabled:  { type: DataTypes.BOOLEAN, defaultValue: true }
+    characterId: DataTypes.INTEGER,
+    quality: DataTypes.INTEGER,
+    userId: DataTypes.STRING,
+    imageHash: DataTypes.STRING,
+    enabled:  { type: DataTypes.BOOLEAN, defaultValue: true },
+    printNr: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Card',
