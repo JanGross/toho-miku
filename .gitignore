@@ -4,6 +4,8 @@
 
 ### Visual Studio Code ###
 .vscode 
+# Except launch.json
+!.vscode/launch.json
 
 ### Node ###
 # Logs
