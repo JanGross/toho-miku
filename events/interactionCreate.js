@@ -2,10 +2,12 @@ require("dotenv").config();
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v10")
 const { Guild, User } = require("../models");
+const { UserUtils } = require("../util");
 
 module.exports = {
     name: "interactionCreate",
     async execute (interaction) {
+        if (!UserUtils.registrationCheck(interaction)) return;
         if (!interaction.isCommand()) return;
 
         const guild = await interaction.guild;
@@ -30,19 +32,6 @@ module.exports = {
             });
 
         }
-        //check if the user exists in the database, if not tell him to use the /register command
-        let user = await User.findOne({
-            where: {
-                discordId: interaction.member.id
-            }
-        });
-        if (!user && interaction.commandName !== "register") {
-            interaction.reply({
-                content: `You are not registered, use the /register command`,
-                ephemeral: false
-            });
-            return;
-        }
         
         const command = interaction.client.commands.get(interaction.commandName);
 
@@ -53,7 +42,7 @@ module.exports = {
         } catch (err) {
             if (err) console.log(err);
             await interaction.reply({
-                content: `An error occured processing the command :(\n \`\`\`${JSON.stringify(err, null, 2)}\`\`\``,
+                content: `An error occured processing the command :(\n \`\`\`${err.stack}\`\`\``,
                 ephemeral: false
             });
         }

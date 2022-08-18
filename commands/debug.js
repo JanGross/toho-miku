@@ -1,5 +1,7 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { SlashCommandBuilder, ComponentType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { customAlphabet } = require("nanoid");
+const { Card, User, Character } = require("../models");
+const Util = require("../util/cards");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -9,20 +11,12 @@ module.exports = {
                 option
                     .setName("feature")
                     .setDescription("The command to debug")
-                    .setRequired(true)
+                    .setRequired(false)
                 ),
 
     async execute(interaction) {
-        const row = new ActionRowBuilder()
-			.addComponents(
-				new ButtonBuilder()
-					.setCustomId('primary')
-					.setLabel('Primary')
-					.setStyle(ButtonStyle.Primary),
-			);
-
-		await interaction.reply({ content: 'Pong!', components: [row] });
-        return;
+        const identifier = Util.generateIdentifier();
+        
         switch (interaction.options.getString("feature")) {
         case "ping":
             interaction.reply({
@@ -42,6 +36,15 @@ module.exports = {
                 ephemeral: false
             });
             break;
+        case "clear_cards":
+            const cards = await Card.findAll();
+            for (let i = 0; i < cards.length; i++) {
+                await cards[i].destroy();
+            }
+            interaction.reply({
+                content: `Cleared ${cards.length} cards`,
+                ephemeral: false
+            });
         }
     }
 }

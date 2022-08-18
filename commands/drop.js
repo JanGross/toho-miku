@@ -1,47 +1,93 @@
-const { SlashCommandBuilder } = require("discord.js");
-const { Card, User } = require("../models");
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
+const { Card, User, Character } = require("../models");
 const { customAlphabet } = require("nanoid");
+const { CardUtils, UserUtils, ReplyUtils } = require("../util");
+const card = require("../models/card");
 
 module.exports = {
     data: new SlashCommandBuilder()
             .setName("drop")
-            .setDescription("Drop a card")
-            .addIntegerOption((option) =>
-                option
-                    .setName("id")
-                    .setDescription("The id of the character to drop")
-                    .setRequired(true)
-                ),
+            .setDescription("Drop a card"),
 
     async execute(interaction) {
-        //get user id from database given the userID
         const user = await User.findOne({
             where: {
                 discordId: interaction.member.id
             }
         });
 
-        //create new card with the given character id, and the user id
-        const nanoid = customAlphabet('23456789ABCDEFGHJKLMNPRSTUVWXYZ',6); //Up to 887.503.681 
-        const identifier = nanoid();
-        const existingCharacterCount = await Card.count({
-            where: {
-                characterId: interaction.options.getInteger("id")
+        //Generate 3 cards, each is persisted with an initial userId of NULL
+        const cards = [];
+        for (let i = 0; i < 3; i++) {
+            //get number of characters in database
+            const characterId = Math.floor(Math.random() * await CardUtils.getCharacterCount()) + 1;
+            console.log(`characterId: ${characterId}`);
+            
+            let newCard = await Card.create({
+                characterId: characterId,
+                identifier: CardUtils.generateIdentifier(),
+                quality: 1,
+                printNr: await CardUtils.getNextPrintNumber(characterId),
+                
+            });
+            cards.push(newCard);
+        }
+
+        let reply = "You have dropped the following cards: \n";
+        
+        const row = new ActionRowBuilder();
+
+        for (const [i, card] of cards.entries()) {
+            let character = await Character.findOne({
+                where: {
+                    id: card.characterId
+                }
+            });
+            reply += `IID: ${card.id} - ID:${card.identifier} \nP: ${card.printNr} Q: ${card.quality} \nC: ${character.name} \n----------\n`;
+        
+            //Add claim button for each card
+            row.addComponents(
+				new ButtonBuilder()
+					.setCustomId(`claim-${i}-${card.identifier}`)
+					.setLabel(`Claim  ${i+1}`)
+					.setStyle(ButtonStyle.Primary),
+			);
+        }
+
+		const message = await interaction.reply({ content: reply, components: [row], fetchReply: true });
+
+        const filter = m => m.author.id === interaction.user.id;
+        const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 15000 });
+
+        collector.on('collect', async i => {
+            let cardId = i.customId.split("-")[1];
+            if (await cards[cardId].userId) { i.reply({ content: "This card has already been claimed!", ephemeral: true }); return; }
+
+            let claimUser = await UserUtils.getUserByDiscordId(i.user.id);
+            if (claimUser) {
+                //Update card with the user id
+                cards[cardId].userId = claimUser.id;
+                await cards[cardId].save();
+                //fetch character name from database given the character id
+                let character = await Character.findOne({
+                    attributes: ["name"],
+                    where: {
+                        id: cards[cardId].characterId
+                    }
+                });
+                i.reply({ content: `${i.user} (${claimUser.id}) claimed ${character.name}`, ephemeral: false });
+                let newRow = ReplyUtils.recreateComponents(i.message.components);
+                newRow.components[cardId].setLabel("Claimed");
+                newRow.components[cardId].setStyle(ButtonStyle.Success);
+                newRow.components[cardId].setDisabled(true);
+
+                message.edit({ components: [newRow] });
             }
         });
-
-        const card = await Card.create({
-            characterId: interaction.options.getInteger("id"),
-            identifier: identifier,
-            quality: 1,
-            printNr: existingCharacterCount + 1,
-            userId: user.id
-        });
-
-        //reply with the new card id
-        interaction.reply({
-            content: `Dropped card ${card.id}`,
-            ephemeral: false
+        
+        collector.on('end', collected => {
+            console.log(`Collected ${collected.size} interactions.`);
+            message.interaction.editReply({ components: [], deferred: true });
         });
         
     }

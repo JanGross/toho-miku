@@ -14,7 +14,9 @@ async function syncDb() {
 
 }
 
+
 module.exports = {
+    name: "DbUtils",
     getDb,
     syncDb
 }

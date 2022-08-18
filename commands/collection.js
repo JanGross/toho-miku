@@ -39,7 +39,7 @@ module.exports = {
             message += `------------------------ \n`;
         }
         interaction.reply({
-            content: message,
+            content: message.substring(0, 1500),
             ephemeral: false
         });
                 
