@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { Console } = require("console");
 const fs = require("fs");
-const {Client, Intents, Collection} = require("discord.js");
+const {Client, GatewayIntentBits, Collection} = require("discord.js");
 const dbUtil = require("./util/db")
 
 const logger = new Console({
@@ -9,10 +9,10 @@ const logger = new Console({
     stderr: process.stderr
 });
 const client = new Client({intents: [
-    Intents.FLAGS.GUILDS,
-    Intents.FLAGS.GUILD_MESSAGES,
-    Intents.FLAGS.GUILD_MEMBERS,
-    Intents.FLAGS.GUILD_PRESENCES
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildPresences,
+    GatewayIntentBits.GuildMembers
 ]});
 
 const commandFiles = fs.readdirSync("./commands").filter(file => file.endsWith(".js"));

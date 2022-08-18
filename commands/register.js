@@ -1,5 +1,5 @@
 //User registration
-const { SlashCommandBuilder } = require("@discordjs/builders");
+const { SlashCommandBuilder } = require("discord.js");
 const { User } = require("../models");
 
 module.exports = {

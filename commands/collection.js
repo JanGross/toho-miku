@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("@discordjs/builders");
+const { SlashCommandBuilder } = require("discord.js");
 const { Card, User, Character } = require("../models");
 
 //fetch all cards owned by the user and list them
