@@ -13,7 +13,7 @@ module.exports = {
                     .setDescription("The command to debug")
                     .setRequired(false)
                 ),
-
+    permissionLevel: 2,
     async execute(interaction) {
         const identifier = CardUtils.generateIdentifier();
         let user = await UserUtils.getUserByDiscordId(interaction.member.id);
@@ -70,6 +70,13 @@ module.exports = {
                 content: `Reset cooldowns`,
                 ephemeral: false
             });
+            break;
+        default:
+            interaction.reply({
+                content: `Your permission level is ${await UserUtils.getPermissionLevel(interaction.member)}`,
+                ephemeral: false
+            });
+            break;
         }
     }
 }

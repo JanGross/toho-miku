@@ -35,8 +35,20 @@ module.exports = {
             });
 
         }
-        
+
         const command = interaction.client.commands.get(interaction.commandName);
+        
+        //check if user has permissions to run the command
+        //TODO: pass down this user object to avoid duplicate queries
+        let user = await UserUtils.getUserByDiscordId(interaction.member.id);
+        let permissionLevel = await UserUtils.getPermissionLevel(interaction.member);
+        if (command.permissionLevel > permissionLevel) {
+            interaction.reply({
+                content: `You do not have permission to run this command`,
+                ephemeral: true
+            });
+            return;
+        }
 
         if (!command) return;
 

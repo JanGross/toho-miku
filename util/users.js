@@ -1,4 +1,5 @@
-const { User } = require("../models");
+const { User, Guild } = require("../models");
+const GeneralUtils = require("./general");
 
 module.exports = {
     name: "UserUtils",
@@ -65,5 +66,37 @@ module.exports = {
         let newCooldown = new Date(new Date().getTime() + cooldown);
         user[`next${cooldownType[0].toUpperCase() + cooldownType.slice(1)}`] = newCooldown;
         await user.save();
+    },
+
+    getPermissionLevel: async function(user) {
+        /* THIS FUNCTION EXPECTS A DISCORD USER INSTANCE!  
+        * Returns the permission level of the user
+        * 0 - no permissions
+        * 1 - guild permissions
+        * 2 - admin permissions
+        */
+        let guild = await Guild.findOne({
+            where: {
+                guildId: user.guild.id
+            }
+        });
+
+        //Global Admin
+        let adminIDs = await GeneralUtils.getBotProperty("adminIDs");
+        if (adminIDs.includes(user.id)) {
+            return 2;
+        }
+        
+        //Guild Admin if role is present
+        if(user._roles.includes(String(guild.adminRoleId))) {
+            return 1;
+        }
+        //or if user is owner
+        if(user.guild.ownerId === user.id) {
+            return 1;
+        }
+
+        //Regular User
+        return 0;
     }
 }

@@ -12,7 +12,7 @@ module.exports = {
                     .setDescription("The id of the character to drop")
                     .setRequired(true)
                 ),
-
+    permissionLevel: 2,
     async execute(interaction) {
         //get user id from database given the userID
         const user = await User.findOne({
