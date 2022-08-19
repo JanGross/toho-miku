@@ -5,6 +5,8 @@ services:
     image: node:16.9.0-alpine
     command: sh -c "npm install && node ."
     restart: unless-stopped
+    environment:
+      - TZ=Europe/Berlin
     depends_on:
       - "mysql"
     working_dir: /app
@@ -18,11 +20,11 @@ services:
         - bandbot-db:/var/lib/mysql
         - ./db:/tmp/db
       environment: 
-        MYSQL_ROOT_PASSWORD: ${DB_ROOTPW}
-        MYSQL_DATABASE: ${DB_DATABASE}
-        MYSQL_USER: ${DB_USERNAME}
-        MYSQL_PASSWORD: ${DB_PASSWORD}
-
+        - TZ=Europe/Berlin
+        - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+        - MYSQL_DATABASE=${DB_DATABASE}
+        - MYSQL_USER=${DB_USERNAME}
+        - MYSQL_PASSWORD=${DB_PASSWORD}
 
 volumes:
   bandbot-db:

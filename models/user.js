@@ -17,7 +17,10 @@ module.exports = (sequelize, DataTypes) => {
   User.init({
     discordId: DataTypes.BIGINT,
     active: DataTypes.INTEGER,
-    privacy: DataTypes.INTEGER
+    privacy: DataTypes.INTEGER,
+    nextDrop: DataTypes.DATE,
+    nextPull: DataTypes.DATE,
+    nextDaily: DataTypes.DATE
   }, {
     sequelize,
     modelName: 'User',

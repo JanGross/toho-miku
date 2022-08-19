@@ -15,14 +15,55 @@ module.exports = {
         if (user) {
             return true;
         }
+
         if (!interaction.isButton() && interaction.commandName === "register") {
             return true;
         }
+
         interaction.reply({
             content: `${interaction.member} You are not registered, use the /register command`,
             ephemeral: false
         });
         
         return false;
+    },
+
+    getCooldowns: async function(user) {
+        /* Returns an object with the following properties:
+            * now: the current time in milliseconds
+            --- For each key in cooldownKeys ---
+                * nextPullTimestamp: the next time the user can pull a card in milliseconds
+                * pullCooldown: time in milliseconds until the user can pull again
+                * pullCooldownFormatted: print friendly version of pullCooldown in hours and minutes
+        */
+
+        const cooldownKeys = ["Pull", "Drop", "Daily"]
+
+        let reply = {
+            now: new Date().getTime()
+        };
+
+        for (key of cooldownKeys) {
+            reply[`next${key}Timestamp`] = user[`next${key}`].getTime();
+            let cooldown = Math.max(reply[`next${key}Timestamp`] - reply['now'], 0);
+            reply[`${key.toLowerCase()}Cooldown`] = cooldown;
+            if (cooldown > 0) {
+                reply[`${key.toLowerCase()}CooldownFormatted`] = `Next ${key} in ${Math.floor(cooldown / 3600000)} hours ` + 
+                                                                `and ${Math.floor((cooldown % 3600000) / 60000)} minutes`;
+            } else {
+                reply[`${key.toLowerCase()}CooldownFormatted`] = `${key} Ready!`;
+            }
+        }
+ 
+        return reply;
+    },
+
+    setCooldown: async function(user, cooldownType, cooldown) {
+        /* cooldownType: "pull", "drop", "daily"
+         * cooldown: time in milliseconds
+         */
+        let newCooldown = new Date(new Date().getTime() + cooldown);
+        user[`next${cooldownType[0].toUpperCase() + cooldownType.slice(1)}`] = newCooldown;
+        await user.save();
     }
 }

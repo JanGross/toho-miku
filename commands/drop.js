@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
 const { Card, User, Character } = require("../models");
 const { customAlphabet } = require("nanoid");
-const { CardUtils, UserUtils, ReplyUtils } = require("../util");
+const { CardUtils, UserUtils, ReplyUtils, GeneralUtils } = require("../util");
 const card = require("../models/card");
 
 module.exports = {
@@ -10,11 +10,16 @@ module.exports = {
             .setDescription("Drop a card"),
 
     async execute(interaction) {
-        const user = await User.findOne({
-            where: {
-                discordId: interaction.member.id
-            }
-        });
+        const user = await UserUtils.getUserByDiscordId(interaction.member.id);
+
+        const cooldowns = await UserUtils.getCooldowns(user);
+        if (cooldowns.dropCooldown > 0) {
+            interaction.reply({
+                content: `You can't drop cards for another ${cooldowns.dropCooldown} milliseconds`,
+                ephemeral: false
+            });
+            return;
+        }
 
         //Generate 3 cards, each is persisted with an initial userId of NULL
         const cards = [];
@@ -55,6 +60,8 @@ module.exports = {
         }
 
 		const message = await interaction.reply({ content: reply, components: [row], fetchReply: true });
+        //set users drop cooldown
+        await UserUtils.setCooldown(user, "drop", await GeneralUtils.getBotProperty("dropTimeout"));
 
         const filter = m => m.author.id === interaction.user.id;
         const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 15000 });
@@ -64,10 +71,21 @@ module.exports = {
             if (await cards[cardId].userId) { i.reply({ content: "This card has already been claimed!", ephemeral: true }); return; }
 
             let claimUser = await UserUtils.getUserByDiscordId(i.user.id);
+            const cooldowns = await UserUtils.getCooldowns(user);
+            if (cooldowns.pullCooldown > 0) {
+                i.reply({
+                    content: `You can't claim cards for another ${cooldowns.dropCooldown} milliseconds`,
+                    ephemeral: false
+                });
+                return;
+            }
+
             if (claimUser) {
                 //Update card with the user id
                 cards[cardId].userId = claimUser.id;
+                await UserUtils.setCooldown(user, "pull", await GeneralUtils.getBotProperty("pullTimeout"));
                 await cards[cardId].save();
+                
                 //fetch character name from database given the character id
                 let character = await Character.findOne({
                     attributes: ["name"],
@@ -87,7 +105,7 @@ module.exports = {
         
         collector.on('end', collected => {
             console.log(`Collected ${collected.size} interactions.`);
-            message.interaction.editReply({ components: [], deferred: true });
+            message.edit({ components: [] });
         });
         
     }

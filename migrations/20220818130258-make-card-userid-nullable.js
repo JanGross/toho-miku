@@ -12,7 +12,7 @@ module.exports = {
   async down (queryInterface, Sequelize) {
     await queryInterface.changeColumn('Cards', 'userId', {
       type: Sequelize.INTEGER,
-      allowNull: false
+      defaultValue: 0
     });
   }
 };

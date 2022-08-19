@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, ComponentType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { customAlphabet } = require("nanoid");
-const { Card, User, Character } = require("../models");
-const Util = require("../util/cards");
+const { Card, User } = require("../models");
+const { UserUtils, CardUtils, GeneralUtils } = require("../util");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,8 +15,8 @@ module.exports = {
                 ),
 
     async execute(interaction) {
-        const identifier = Util.generateIdentifier();
-        
+        const identifier = CardUtils.generateIdentifier();
+        let user = await UserUtils.getUserByDiscordId(interaction.member.id);
         switch (interaction.options.getString("feature")) {
         case "ping":
             interaction.reply({
@@ -43,6 +43,31 @@ module.exports = {
             }
             interaction.reply({
                 content: `Cleared ${cards.length} cards`,
+                ephemeral: false
+            });
+            break;
+        case "cooldowns":
+            const timeouts = await UserUtils.getCooldowns(user);
+            console.log(`UserTimeouts: ${JSON.stringify(timeouts)}`);
+            let timeoutInMinutes = 0;
+            interaction.reply({
+                content: `\`\`\`${JSON.stringify(timeouts, null, 2)}\`\`\` `,
+                ephemeral: false
+            });
+            break;
+        case "bot":
+            let botProperties = await GeneralUtils.getBotProperty(null);
+            interaction.reply({
+                content: `\`\`\`${JSON.stringify(botProperties, null, 2)}\`\`\` `,
+                ephemeral: false
+            });
+            break;
+        case "reset_cd":
+            await UserUtils.setCooldown(user, "pull", 1);
+            await UserUtils.setCooldown(user, "drop", 1);
+            await UserUtils.setCooldown(user, "daily", 1);
+            interaction.reply({
+                content: `Reset cooldowns`,
                 ephemeral: false
             });
         }
