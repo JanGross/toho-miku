@@ -7,8 +7,11 @@ const { UserUtils } = require("../util");
 module.exports = {
     name: "interactionCreate",
     async execute (interaction) {
-        if (!UserUtils.registrationCheck(interaction)) return;
+        let isRegistered = await UserUtils.registrationCheck(interaction);
+        if (!isRegistered) return;
+        console.log("User is registered");
         if (!interaction.isCommand()) return;
+        console.log("Interaction is a command");
 
         const guild = await interaction.guild;
         //check if guild exists in database

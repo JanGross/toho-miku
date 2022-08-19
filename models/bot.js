@@ -15,10 +15,12 @@ module.exports = (sequelize, DataTypes) => {
   }
   Bot.init({
     maintenance: DataTypes.BOOLEAN,
-    adminIDs: DataTypes.STRING
+    adminIDs: DataTypes.STRING,
+    pullTimeout: DataTypes.INTEGER,
+    dropTimeout: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'Guild',
+    modelName: 'Bot',
   });
   return Bot;
 };
