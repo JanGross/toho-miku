@@ -23,7 +23,7 @@ module.exports = {
       bandId: 1,
       name: 'Miku Kobato',
       description: 'Miku Kobato is a Japanese singer, songwriter and guitarist. She is the initial founding member and main lyricist for BAND-MAID.',
-      imageURL: 'https://cdn.discordapp.com/attachments/851543504831119380/1009468495077048330/unknown.png',
+      imageIdentifier: 'bandmaid/miku.png',
       enabled: true
     },
     {
@@ -31,7 +31,7 @@ module.exports = {
       bandId: 1,
       name: 'Akane Hirose',
       description: 'Akane Hirose is a Japanese drummer and founding member of BAND-MAID.',
-      imageURL: 'https://cdn.discordapp.com/attachments/851543504831119380/1009469985296490568/unknown.png',
+      imageIdentifier: 'bandmaid/akane.png',
       enabled: true
     }]);
   },

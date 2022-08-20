@@ -1,26 +1,27 @@
-const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, AttachmentBuilder } = require("discord.js");
 const { Card, User, Character } = require("../models");
 const { customAlphabet } = require("nanoid");
-const { CardUtils, UserUtils, ReplyUtils, GeneralUtils } = require("../util");
+const { CardUtils, UserUtils, ReplyUtils, GeneralUtils, Rendering } = require("../util");
 const card = require("../models/card");
 
 module.exports = {
     data: new SlashCommandBuilder()
-            .setName("drop")
-            .setDescription("Drop a card"),
-
+    .setName("drop")
+    .setDescription("Drop a card"),
+    
     async execute(interaction) {
         const user = await UserUtils.getUserByDiscordId(interaction.member.id);
-
+        
+        const permissionLevel = await UserUtils.getPermissionLevel(interaction.member);
         const cooldowns = await UserUtils.getCooldowns(user);
-        if (cooldowns.dropCooldown > 0) {
+        if (cooldowns.dropCooldown > 0 && permissionLevel < 2) {
             interaction.reply({
                 content: `You can't drop cards for another ${cooldowns.dropCooldown} milliseconds`,
                 ephemeral: false
             });
             return;
         }
-
+        
         //Generate 3 cards, each is persisted with an initial userId of NULL
         const cards = [];
         for (let i = 0; i < 3; i++) {
@@ -41,6 +42,7 @@ module.exports = {
         let reply = "You have dropped the following cards: \n";
         
         const row = new ActionRowBuilder();
+        let deckImage = await Rendering.renderCardStack(cards);
 
         for (const [i, card] of cards.entries()) {
             let character = await Character.findOne({
@@ -59,12 +61,16 @@ module.exports = {
 			);
         }
 
-		const message = await interaction.reply({ content: reply, components: [row], fetchReply: true });
+        const file = new AttachmentBuilder(deckImage);
+    
+        const message = await interaction.reply({ content: 'asd', components: [row], files: [file], fetchReply: true });
+
+		//const message = await interaction.reply({ content: reply, components: [row], fetchReply: true });
         //set users drop cooldown
         await UserUtils.setCooldown(user, "drop", await GeneralUtils.getBotProperty("dropTimeout"));
 
         const filter = m => m.author.id === interaction.user.id;
-        const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 15000 });
+        const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 25000 });
 
         collector.on('collect', async i => {
             let cardId = i.customId.split("-")[1];
@@ -72,7 +78,7 @@ module.exports = {
 
             let claimUser = await UserUtils.getUserByDiscordId(i.user.id);
             const cooldowns = await UserUtils.getCooldowns(user);
-            if (cooldowns.pullCooldown > 0) {
+            if (cooldowns.pullCooldown > 0 && permissionLevel < 2) {
                 i.reply({
                     content: `You can't claim cards for another ${cooldowns.dropCooldown} milliseconds`,
                     ephemeral: false
@@ -98,14 +104,21 @@ module.exports = {
                 newRow.components[cardId].setLabel("Claimed");
                 newRow.components[cardId].setStyle(ButtonStyle.Success);
                 newRow.components[cardId].setDisabled(true);
-
-                message.edit({ components: [newRow] });
+                let deckImage = await Rendering.renderCardStack(cards);
+                message.edit({ components: [newRow], files: [new AttachmentBuilder(deckImage)] });
             }
         });
         
-        collector.on('end', collected => {
+        collector.on('end', async collected => {
             console.log(`Collected ${collected.size} interactions.`);
-            message.edit({ components: [] });
+            for (let card of cards) {
+                if (!card.userId) {
+                    card.userId = 1;
+                    await card.save();
+                }
+            }
+            let deckImage = await Rendering.renderCardStack(cards);
+            message.edit({ components: [], files: [new AttachmentBuilder(deckImage)] });
         });
         
     }

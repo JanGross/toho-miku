@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   Character.init({
     name: DataTypes.STRING,
     bandId: DataTypes.INTEGER,
-    imageURL: DataTypes.STRING,
+    imageIdentifier: DataTypes.STRING,
     description: DataTypes.TEXT,
     enabled: DataTypes.BOOLEAN
   }, {
