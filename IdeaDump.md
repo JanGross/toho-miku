@@ -121,3 +121,11 @@ this moved to stage 3 or later to counter stagnation of user aquisition
 Depending on the discord presence availability we could use presence updates  
 or use the Spotify API directly.  
 Considering the instability of both the Spotify and LastFM APIs, we might need an alternative  
+
+### On rendering animation
+short clips easily take up to 10 sec top render
+webp not supported by discord, gif is huge af
+To hide the rendering dely we could
+- prerender fixed "claim animations"
+- not reveal the claimed cards immediately 
+- 
