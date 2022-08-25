@@ -12,6 +12,7 @@ services:
     working_dir: /app
     volumes:
       - ./:/app
+      - /usr/share/fonts/:/usr/share/fonts/
   mysql:
       image: mysql:8.0
       ports:
