@@ -44,20 +44,14 @@ module.exports = {
         const row = new ActionRowBuilder();
         let deckImage = await Rendering.renderCardStack(cards);
 
-        for (const [i, card] of cards.entries()) {
-            let character = await Character.findOne({
-                where: {
-                    id: card.characterId
-                }
-            });
-        
+        for (let i = 0; i < cards.length; i++) {
             //Add claim button for each card
             row.addComponents(
 				new ButtonBuilder()
-					.setCustomId(`claim-${i}-${card.identifier}`)
+					.setCustomId(`claim-${i}-${cards[i].identifier}`)
 					.setLabel(`Claim  ${i+1}`)
 					.setStyle(ButtonStyle.Primary),
-			);
+			);            
         }
 
         const file = new AttachmentBuilder(deckImage);

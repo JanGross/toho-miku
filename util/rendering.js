@@ -57,7 +57,7 @@ module.exports = {
             return './assets/cards/card_cover.png';
         }
 
-        let hash = crypto.createHash('md5').update(character.imageIdentifier + card.quality).digest('hex');
+        let hash = crypto.createHash('md5').update(character.imageIdentifier + card.quality + (card.userId == 1 ? 'unclaimed' : 'claimed')).digest('hex');
         //TODO: Add switch to turn off or bypass caching
         if (fs.existsSync(`./assets/image_cache/${hash}.gif`)) {
             return `./assets/image_cache/${hash}.gif`;
@@ -78,8 +78,9 @@ module.exports = {
         await cardImage.composite([
             {input: border, top:0, left: 0, tile: true},
             {input: label, top:0, left: 0, tile: true}]);
+        //BUGBUG: Grayscale does not apply to card border
         if (card.userId === 1) {
-            cardImage.grayscale()
+            await cardImage.grayscale()
             .modulate({
                 brightness: 0.5
             });
