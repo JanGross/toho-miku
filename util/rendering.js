@@ -3,6 +3,15 @@ const crypto = require('crypto');
 const fs = require('fs');
 const { Character } = require('../models');
 
+const QualityColors = {
+    1: {r: 0, g: 0, b: 0}, //bad
+    2: {r: 150, g: 150, b: 50}, //ok
+    3: {r: 0, g: 255, b: 0}, //good
+    4: {r: 0, g: 255, b: 255}, //great
+    5: {r: 0, g: 0, b: 255}, //epic
+    6: {r: 255, g: 255, b: 0} //shiny
+}
+
 //TODO: Handle missing images
 module.exports = {
     name: "Rendering",
@@ -48,7 +57,7 @@ module.exports = {
             return './assets/cards/card_cover.png';
         }
 
-        let hash = crypto.createHash('md5').update(character.imageIdentifier).digest('hex');
+        let hash = crypto.createHash('md5').update(character.imageIdentifier + card.quality).digest('hex');
         //TODO: Add switch to turn off or bypass caching
         if (fs.existsSync(`./assets/image_cache/${hash}.gif`)) {
             return `./assets/image_cache/${hash}.gif`;
@@ -56,7 +65,7 @@ module.exports = {
 
         console.log(`Rendering card ${hash}`);
 
-        let border = await sharp(`./assets/border.svg`).toBuffer();
+        let border = await sharp(`./assets/overlays/border.svg`).tint(QualityColors[card.quality]).toBuffer();
         //BUGBUG: Custom fonts not loading
         let label = Buffer.from(`
         <svg width="300" height="500">

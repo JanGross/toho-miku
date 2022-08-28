@@ -28,11 +28,11 @@ module.exports = {
             //get number of characters in database
             const characterId = Math.floor(Math.random() * await CardUtils.getCharacterCount()) + 1;
             console.log(`characterId: ${characterId}`);
-            
+            //random number between 1 and 6
             let newCard = await Card.create({
                 characterId: characterId,
                 identifier: CardUtils.generateIdentifier(),
-                quality: 1,
+                quality: Math.floor(Math.random() * 6) + 1,
                 printNr: await CardUtils.getNextPrintNumber(characterId),
                 
             });
