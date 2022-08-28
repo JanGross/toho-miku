@@ -1,0 +1,18 @@
+[
+    {
+        "id": "1",
+        "bandId": "1",
+        "name": "Miku Kobato",
+        "description": "Miku Kobato is a Japanese singer, songwriter and guitarist. She is the initial founding member and main lyricist for BAND-MAID.",
+        "imageIdentifier": "bandmaid/miku.png",
+        "enabled": 0
+    },
+    {
+        "id": "2",
+        "bandId": "1",
+        "name": "Akane Hirose",
+        "description": "Akane Hirose is a Japanese drummer and founding member of BAND-MAID.",
+        "imageIdentifier": "bandmaid/akane.png",
+        "enabled": 0
+    }
+]
