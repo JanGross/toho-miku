@@ -7,7 +7,6 @@ const { Character } = require('../models');
 module.exports = {
     name: "Rendering",
     renderCardStack: async function(cards) {
-        cards.sort((a, b) => a.charcterId - b.charcterId);
 
         for (let card of cards) {
             console.log(`Iterating card ${card.id}`);

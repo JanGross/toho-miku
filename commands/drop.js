@@ -39,7 +39,7 @@ module.exports = {
             cards.push(newCard);
         }
 
-        let reply = "You have dropped the following cards: \n";
+        cards.sort((a, b) => a.characterId - b.characterId);
         
         const row = new ActionRowBuilder();
         let deckImage = await Rendering.renderCardStack(cards);
@@ -50,7 +50,6 @@ module.exports = {
                     id: card.characterId
                 }
             });
-            reply += `IID: ${card.id} - ID:${card.identifier} \nP: ${card.printNr} Q: ${card.quality} \nC: ${character.name} \n----------\n`;
         
             //Add claim button for each card
             row.addComponents(
