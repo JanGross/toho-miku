@@ -99,13 +99,13 @@ module.exports = {
                         id: cards[cardId].characterId
                     }
                 });
-                i.reply({ content: `${i.user} (${claimUser.id}) claimed ${character.name}`, ephemeral: false });
+                i.reply({ content: `${i.user} (${claimUser.id}) claimed a card! [${cards[cardId].identifier}]`, ephemeral: false });
                 let newRow = ReplyUtils.recreateComponents(i.message.components);
                 newRow.components[cardId].setLabel("Claimed");
                 newRow.components[cardId].setStyle(ButtonStyle.Success);
                 newRow.components[cardId].setDisabled(true);
-                let deckImage = await Rendering.renderCardStack(cards);
-                message.edit({ components: [newRow], files: [new AttachmentBuilder(deckImage)] });
+                //let deckImage = await Rendering.renderCardStack(cards);
+                message.edit({ components: [newRow] });
             }
         });
         
