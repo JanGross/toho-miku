@@ -1,0 +1,42 @@
+[
+    {
+        "id": "3",
+        "bandId": "2",
+        "name": "Hatsune Miku",
+        "description": "Created by Crypton Future Media for the second edition of Yamaha Corporation's Vocaloid singing synthesizer application, Hatsune Miku is nigh-universally considered the face of Vocaloid as a whole. The software, first released in 2004, is a voice synthesizer which mimics singing using lyrical and melodic input.",
+        "imageIdentifier": "vocaloid/miku_animated.gif",
+        "enabled": 0
+    },
+    {
+        "id": "4",
+        "bandId": "2",
+        "name": "GUMI",
+        "description": "A Vocaloid created by INTERNET Co. based on the voice of Megumi Nakajima.",
+        "imageIdentifier": "vocaloid/gumi.jpg",
+        "enabled": 0
+    },
+    {
+        "id": "5",
+        "bandId": "2",
+        "name": "IA",
+        "description": "IA is a character and voice created by 1st Place for the Vocaloid 3 speech synthesizer software. She was released in January 2012, and made her video game in 2013's Demon Gaze, providing the vocals for the game's soundtrack as well being a recruitable party member via DLC.",
+        "imageIdentifier": "vocaloid/ia.jpg",
+        "enabled": 0
+    },
+    {
+        "id": "6",
+        "bandId": "2",
+        "name": "Kagamine Len",
+        "description": "A character from the Vocaloid2 2 Character Vocal Series software designed by Crypton Future Media. Len appears as an unlockable character skin in Hatsune Miku: Project Diva for the PSP and as a fully playable character in the sequel, Project Diva 2nd.",
+        "imageIdentifier": "vocaloid/len.png",
+        "enabled": 0
+    },
+    {
+        "id": "7",
+        "bandId": "2",
+        "name": "Kagamine Rin",
+        "description": "A character from the Vocaloid2 2 Character Vocal Series software designed by Crypton Future Media. Rin appears as an unlockable character skin in Hatsune Miku: Project Diva for the PSP and as a fully playable character in the sequel, Project Diva 2nd.",
+        "imageIdentifier": "vocaloid/rin.png",
+        "enabled": 0
+    }
+]
