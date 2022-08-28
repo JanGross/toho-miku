@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, AttachmentBuilder } = require("discord.js");
-const { Card, User, Character } = require("../models");
+const { Card, User, Character, DropHistory } = require("../models");
 const { customAlphabet } = require("nanoid");
 const { CardUtils, UserUtils, ReplyUtils, GeneralUtils, Rendering } = require("../util");
 const card = require("../models/card");
@@ -109,13 +109,28 @@ module.exports = {
         });
         
         collector.on('end', async collected => {
+            let dropHistory = {};
+            
             console.log(`Collected ${collected.size} interactions.`);
             for (let card of cards) {
                 if (!card.userId) {
                     card.userId = 1;
                     await card.save();
                 }
+                let historyEntry = {
+                    cardData: JSON.stringify(card),
+                    ogUserId: card.userId,
+                };
+                dropHistory[card.identifier] = historyEntry;
             }
+
+            //create new drop history entry
+            let history = await DropHistory.create({
+                dropData: JSON.stringify(dropHistory),
+            });
+
+
+            
             let deckImage = await Rendering.renderCardStack(cards);
             message.edit({ components: [], files: [new AttachmentBuilder(deckImage)] });
         });
