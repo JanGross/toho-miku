@@ -7,30 +7,35 @@ const { Character } = require('../models');
 module.exports = {
     name: "Rendering",
     renderCardStack: async function(cards) {
+        cards.sort((a, b) => a.charcterId - b.charcterId);
+
         for (let card of cards) {
             console.log(`Iterating card ${card.id}`);
             card['render'] = await this.renderCard(card);
         }
         
-        const image = await sharp({
+        let image = await sharp({
             create: {
-            width: 900,
-            height: 500,
-            channels: 4,
-            background: { r: 255, g: 0, b: 0, alpha: 0.5 },
-            animated: true
+                width: 900,
+                height: 500,
+                channels: 4,
+                background: { r: 255, g: 0, b: 0, alpha: 0.5 },
+                animated: true
             }
-         })
-        .composite([
+         }).composite([
             { input: cards[0].render, gravity: 'northwest' },
             { input: cards[1].render, gravity: 'centre' },
             { input: cards[2].render, gravity: 'northeast' },
-        ]);
+        ]); 
 
+        let hash = crypto.createHash('md5').update("CHANGEME").digest('hex');
+        try {
+            await image.gif({effort: 1}).toFile(`./assets/image_cache/${hash}.gif`);            
+        } catch (error) {
+            console.log(error);
+        }
 
-        await image.gif({effort: 1}).toFile(`./assets/image_cache/test.gif`);
-
-        return `./assets/image_cache/test.gif`;
+        return `./assets/image_cache/${hash}.gif`;
 
     },
     renderCard: async function(card) {
@@ -39,12 +44,15 @@ module.exports = {
                 id: card.characterId
             }
         });
-        card.imageIdentifier = card.userId ? character.imageIdentifier : 'card_cover.png';
-        
-        let hash = crypto.createHash('md5').update(card.imageIdentifier).digest('hex');
+
+        if (!card.userId) {
+            return './assets/cards/card_cover.png';
+        }
+
+        let hash = crypto.createHash('md5').update(character.imageIdentifier).digest('hex');
         //TODO: Add switch to turn off or bypass caching
         if (fs.existsSync(`./assets/image_cache/${hash}.gif`)) {
-            return fs.createReadStream(`./assets/image_cache/${hash}.gif`);
+            return `./assets/image_cache/${hash}.gif`;
         }
 
         console.log(`Rendering card ${hash}`);
@@ -57,7 +65,7 @@ module.exports = {
         </svg>
         `);
 
-        const cardImage = await sharp(`./assets/cards/${card.imageIdentifier}`, { animated: true, pages: -1 });
+        const cardImage = await sharp(`./assets/cards/${character.imageIdentifier}`, { animated: true, pages: -1 });
         await cardImage.resize(300, 500);
         await cardImage.composite([
             {input: border, top:0, left: 0, tile: true},
