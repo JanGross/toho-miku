@@ -64,7 +64,8 @@ module.exports = {
 
         const filter = m => m.author.id === interaction.user.id;
         const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 25000 });
-
+        
+        let collectionReplies = [];
         collector.on('collect', async i => {
             let cardId = i.customId.split("-")[1];
             if (await cards[cardId].userId) { i.reply({ content: "This card has already been claimed!", ephemeral: true }); return; }
@@ -92,7 +93,8 @@ module.exports = {
                         id: cards[cardId].characterId
                     }
                 });
-                i.reply({ content: `${i.user} (${claimUser.id}) claimed a card! [${cards[cardId].identifier}]`, ephemeral: false });
+                let reply = await i.reply({ content: `${i.user} (${claimUser.id}) claimed a card! [${cards[cardId].identifier}]`, ephemeral: false, fetchReply: true  });
+                collectionReplies.push({ ref: reply, characterName: character.name });
                 let newRow = ReplyUtils.recreateComponents(i.message.components);
                 newRow.components[cardId].setLabel("Claimed");
                 newRow.components[cardId].setStyle(ButtonStyle.Success);
@@ -104,7 +106,10 @@ module.exports = {
         
         collector.on('end', async collected => {
             let dropHistory = {};
-            
+            for (reply of collectionReplies) {
+                //TODO: strings shouldn't be inlined. Needs refactoring
+                reply.ref.edit({ content: `${reply.ref.content.replace('a card', reply.characterName)}` });
+            }
             console.log(`Collected ${collected.size} interactions.`);
             for (let card of cards) {
                 if (!card.userId) {
