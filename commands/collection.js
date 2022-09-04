@@ -2,6 +2,8 @@ const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Butt
 const { Card, User, Character } = require("../models");
 const UserUtils = require("../util/users");
 
+const pageSize = 8;
+
 //fetch all cards owned by the user and list them
 module.exports = {
     data: new SlashCommandBuilder()
@@ -21,19 +23,8 @@ module.exports = {
         const filter = (i) => i.customId === `previous-${uid}` || i.customId === `next-${uid}`;
         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
         
-        //add buttons for pagination
-        const row = new ActionRowBuilder();
-        row.addComponents(
-            new ButtonBuilder()
-                .setCustomId(`previous-${uid}`)
-                .setLabel(`Previous`)
-                .setStyle(ButtonStyle.Primary),
-            new ButtonBuilder()
-                .setCustomId(`next-${uid}`)
-                .setLabel(`Next`)
-                .setStyle(ButtonStyle.Primary)
-        );
-
+        let row = this.getPaginateComponents(uid, prev=false);
+        
         let embedMessage = await interaction.reply({
             embeds: [embed],
             components: [row],
@@ -41,53 +32,71 @@ module.exports = {
             fetchReply: true
         });
 
-        this.updatePageEmbed(embedMessage, user, offset);  
+        this.updatePageEmbed(uid, embedMessage, user, offset);  
 
-        //TODO: magic number 8 has to be refactored
-        /*  BUGBUG: pagination goes past max cards showing empty pages
-                    going lower than the first page throws SQL error
-        */
         collector.on('collect', async (i) => {
             i.deferUpdate();
             if (i.customId === `previous-${uid}`) {
                 //next
-                offset-=8;
+                offset-=pageSize;
             } else if (i.customId === `next-${uid}`) {
                 //previous
-                offset+=8;
+                offset+=pageSize;
             }
-            this.updatePageEmbed(embedMessage, user, offset);
+            this.updatePageEmbed(uid, embedMessage, user, offset);
         });
 
         collector.on('end', collected => {
             embedMessage.edit({ components: [] });
-            console.log(`Collected ${collected.size} items`);
+            console.log(`Collected ${collected.     size} items`);
         });
 
 
     },
 
-    async updatePageEmbed(i, user, offset) {
-        const cardsPerPage = 8;
+    getPaginateComponents(uid, prev=true, next=true) {
+        //add buttons for pagination
+        let row = new ActionRowBuilder();
+        row.addComponents(
+            new ButtonBuilder()
+            .setCustomId(`previous-${uid}`)
+            .setLabel(`Previous`)
+            .setStyle(ButtonStyle.Primary)
+            .setDisabled(!prev),
+
+            new ButtonBuilder()
+            .setCustomId(`next-${uid}`)
+            .setLabel(`Next`)
+            .setStyle(ButtonStyle.Primary)
+            .setDisabled(!next)
+        );
+        return row;
+    },
+
+    async updatePageEmbed(uid, i, user, offset) {
         let cards = await Card.findAndCountAll({
             where: {
                 userId: user.id
             },
-            limit: cardsPerPage,
+            limit: pageSize,
             offset: offset,
             include: [{
                 model: Character,
             }]
         });
 
+        let pageStart = offset + 1;
+        let pageEnd = offset + cards.rows.length;
+
         //create embed using embedBuilder
         let embed = new EmbedBuilder()
             .setTitle(`$'s collection`)
             .setColor(0x00ff00)
             .setTimestamp()
-            .setFooter({ text: `Cards ${offset+1} - ${offset + cards.rows.length} / ${cards.count}` });
+            .setFooter({ text: `Cards ${pageStart} - ${pageEnd} / ${cards.count}` });
 
         //if the user has no cards, tell him
+        //BUGBUG: no longer working with the new embed flow
         if (cards.count === 0) {
             embed.setTitle("You have no cards in your collection");
             return;
@@ -107,7 +116,7 @@ module.exports = {
                 embed.addFields({ name:'\u200b', value: '\u200b'});
             }
         }
-
-        await i.edit({ embeds: [embed] });
+        let components = this.getPaginateComponents(uid, prev=offset>0, next=pageEnd<cards.count);
+        await i.edit({ embeds: [embed], components: [components] });
     }
 }
