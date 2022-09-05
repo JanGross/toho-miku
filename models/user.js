@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -12,6 +13,18 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.hasMany(models.Card);
+    }
+    //instance methods
+    async getCardsWithCharactersCounted() {
+      let cards = await sequelize.models.Card.findAndCountAll({
+          where: {
+              userId: this.id
+          },
+          include: [{
+              model: sequelize.models.Character,
+          }]
+      });
+      return cards;
     }
   }
   User.init({
