@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.hasMany(models.Card);
+      User.hasOne(models.Profile);
     }
     //instance methods
     async getCardsWithCharactersCounted() {
@@ -26,6 +27,13 @@ module.exports = (sequelize, DataTypes) => {
       });
       return cards;
     }
+    async getProfile() {
+      return await sequelize.models.Profile.findOne({
+          where: {
+              userId: this.id
+          }
+      });
+    }
   }
   User.init({
     discordId: DataTypes.BIGINT,
@@ -35,6 +43,14 @@ module.exports = (sequelize, DataTypes) => {
     nextPull: DataTypes.DATE,
     nextDaily: DataTypes.DATE
   }, {
+    hooks: {
+      afterCreate: async (user, options) => {
+        //Create new user profile
+        await sequelize.models.Profile.create({
+          userId: user.id
+        });
+      }
+    },
     sequelize,
     modelName: 'User',
   });
