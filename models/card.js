@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     identifier: DataTypes.STRING,
     characterId: DataTypes.INTEGER,
     quality: DataTypes.INTEGER,
-    userId: DataTypes.STRING,
+    userId: DataTypes.INTEGER,
     imageHash: DataTypes.STRING,
     enabled:  { type: DataTypes.BOOLEAN, defaultValue: true },
     printNr: DataTypes.INTEGER,
