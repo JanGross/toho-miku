@@ -56,7 +56,7 @@ module.exports = {
             await command.execute(interaction);
         } catch (err) {
             if (err) console.log(err);
-            await interaction.reply({
+            await interaction.channel.send({
                 content: `An error occured processing the command :(\n \`\`\`${err.stack}\`\`\``,
                 ephemeral: false
             });
