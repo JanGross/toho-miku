@@ -10,6 +10,12 @@ const logger = new Console({
 });
 
 //TODO: Fix ./data folders permission so wen can move out dataset in there
+async function runImport() {
+    dbUtil.syncDb();
+    db = dbUtil.getDb();
+    await importBands();
+    await importCharacters();
+}
 
 async function importBands() {
     const bandFiles = fs.readdirSync("./assets/import/bands").filter(file => file.endsWith(".json"));
@@ -77,10 +83,11 @@ async function importCharacters() {
 }
 
 logger.log("Importing...");
-dbUtil.syncDb();
-db = dbUtil.getDb();
-importBands();
-importCharacters();
-logger.log("Import complete");
-
+runImport().then(() => {
+    logger.log("Import complete");
+    process.exit(0);
+}).catch((err) => {
+    logger.error(err);
+    process.exit(1);
+});
 
