@@ -4,7 +4,7 @@ const { Card, Character, Band } = require("../models");
 //fetch all cards owned by the user and list them
 module.exports = {
     data: new SlashCommandBuilder()
-            .setName("set_active")
+            .setName("setenabled")
             .setDescription("Enable or disable entities")
             .addStringOption(option =>
                 option.setName('type')
@@ -22,8 +22,8 @@ module.exports = {
                     .setRequired(true)
             )
             .addBooleanOption(option =>
-                option.setName('active')
-                    .setDescription('Active (true) or inactive (false)')
+                option.setName('enabled')
+                    .setDescription('Enabled (true) or Disabled (false)')
                     .setRequired(true)
             )
             .addBooleanOption(option =>
@@ -37,20 +37,20 @@ module.exports = {
         const type = interaction.options.getString('type');
         
         if (type === 'band') {
-            let band = Band.findOne({
+            let band = await Band.findOne({
                 where: {
                     id: interaction.options.getInteger('id')
                 }
             });
             if (!band) {
-                interaction.reply({
+                interaction.editReply({
                     content: "Band not found",
                     ephemeral: true
                 });
                 return;
             }
-            band.update({
-                active: interaction.options.getBoolean('active')
+            await band.update({
+                enabled: interaction.options.getBoolean('enabled')
             });
             
             if (interaction.options.getBoolean('include_children')) {
@@ -59,20 +59,22 @@ module.exports = {
                         bandId: band.id
                     }
                 });
-                for (let character of characters) {
-                    character.update({
-                        active: interaction.options.getBoolean('active')
-                    });
-                }
+                Character.update({ 
+                    enabled: (interaction.options.getBoolean('enabled') ? 1 : 0)}, {
+                    where: { bandId: band.id }
+                });
+                
             }
 
-            await interaction.reply({
-                content: `${band.name} is now ${(interaction.options.getBoolean('active') ? 'active' : 'inactive')} (Including children: ${interaction.options.getBoolean('include_children')})`,
+            await interaction.editReply({
+                content: `${band.name} is now ` 
+                + `${(interaction.options.getBoolean('enabled') ? 'active' : 'inactive')} `
+                + `(Including children: ${(interaction.options.getBoolean('include_children') ? 'yes' : 'no')})`
             });
             return;
         }
         if (type === 'debug') {
-            interaction.reply({
+            interaction.editReply({
                 content: 'Debug DEBUG',
                 ephemeral: true
             });
