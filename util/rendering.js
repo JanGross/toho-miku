@@ -63,7 +63,10 @@ module.exports = {
             return `./assets/image_cache/${hash}.gif`;
         }
 
-        console.log(`Rendering card ${hash}`);
+        console.log(`Rendering card ${hash} for character ${character.name} ${character.imageIdentifier}`);
+        
+        let filetype = character.imageIdentifier.split('.').pop();
+        let isAnimated = ['gif', 'webp'].includes(filetype);
 
         let border = await sharp(`./assets/overlays/border.svg`).tint(QualityColors[card.quality]).toBuffer();
         //BUGBUG: Custom fonts not loading
@@ -73,7 +76,17 @@ module.exports = {
         </svg>
         `);
 
-        const cardImage = await sharp(`./assets/cards/${character.imageIdentifier}`, { animated: true, pages: -1 });
+        let cardImage;
+        try {
+            console.log("Loading character image");
+            cardImage = await sharp(`./assets/cards/${character.imageIdentifier}`, 
+                                    { animated: isAnimated, pages: (isAnimated ? -1 : 1) });
+            await cardImage.toBuffer();
+        } catch (error) {
+            console.log(`Missing character image: ${character.imageIdentifier}`);
+            cardImage = await sharp(`./assets/cards/missing_image.png`);
+        }
+        console.log("rendering");
         await cardImage.resize(300, 500);
         await cardImage.composite([
             {input: border, top:0, left: 0, tile: true},
@@ -85,8 +98,16 @@ module.exports = {
                 brightness: 0.5
             });
         }
-        await cardImage.gif({effort: 1}).toFile(`./assets/image_cache/${hash}.gif`);
 
-        return `./assets/image_cache/${hash}.gif`;
+        if (isAnimated) {
+            await cardImage.gif({effort: 1})
+        } else {
+            await cardImage.png();
+        }
+
+        let extension = isAnimated ? 'gif' : 'png';
+        await cardImage.toFile(`./assets/image_cache/${hash}.${extension}`);
+
+        return `./assets/image_cache/${hash}.${extension}`;
     }
 }
