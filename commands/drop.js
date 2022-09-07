@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, AttachmentBuilder } = require("discord.js");
-const { Card, User, Character, DropHistory } = require("../models");
+const { Card, User, Character, DropHistory, sequelize } = require("../models");
 const { customAlphabet } = require("nanoid");
 const { CardUtils, UserUtils, ReplyUtils, GeneralUtils, Rendering } = require("../util");
 const card = require("../models/card");
@@ -24,9 +24,17 @@ module.exports = {
         
         //Generate 3 cards, each is persisted with an initial userId of NULL
         const cards = [];
+        let characters = await Character.findAll({
+            where: {
+                enabled: true
+            },
+            order: sequelize.random(),
+            limit: 3
+        });
+
         for (let i = 0; i < 3; i++) {
             //get number of characters in database
-            const characterId = Math.floor(Math.random() * await CardUtils.getCharacterCount()) + 1;
+            const characterId = characters[i].id
             console.log(`characterId: ${characterId}`);
             //random number between 1 and 6
             let newCard = await Card.create({
