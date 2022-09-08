@@ -16,7 +16,7 @@ module.exports = {
         const cooldowns = await UserUtils.getCooldowns(user);
         if (cooldowns.dropCooldown > 0 && permissionLevel < 2) {
             interaction.reply({
-                content: `You can't drop cards for another ${cooldowns.dropCooldown} milliseconds`,
+                content: `You can drop more cards in ${Math.floor((cooldowns.dropCooldown % 3600000) / 60000)} minutes`,
                 ephemeral: false
             });
             return;
@@ -82,7 +82,7 @@ module.exports = {
             const cooldowns = await UserUtils.getCooldowns(user);
             if (cooldowns.pullCooldown > 0 && permissionLevel < 2) {
                 i.reply({
-                    content: `You can't claim cards for another ${cooldowns.dropCooldown} milliseconds`,
+                    content: `You can claim more cards in ${Math.floor((cooldowns.pullCooldown % 3600000) / 60000)} minutes`,
                     ephemeral: false
                 });
                 return;
