@@ -12,7 +12,7 @@ module.exports = {
     async execute(interaction) {
         const user = await UserUtils.getUserByDiscordId(interaction.member.id);
         
-        const permissionLevel = await UserUtils.getPermissionLevel(interaction.member);
+        let permissionLevel = await UserUtils.getPermissionLevel(interaction.member);
         const cooldowns = await UserUtils.getCooldowns(user);
         if (cooldowns.dropCooldown > 0 && permissionLevel < 2) {
             interaction.reply({
@@ -70,7 +70,6 @@ module.exports = {
         //set users drop cooldown
         await UserUtils.setCooldown(user, "drop", await GeneralUtils.getBotProperty("dropTimeout"));
 
-        const filter = m => m.author.id === interaction.user.id;
         const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 25000 });
         
         let collectionReplies = [];
@@ -79,7 +78,8 @@ module.exports = {
             if (await cards[cardId].userId) { i.reply({ content: "This card has already been claimed!", ephemeral: true }); return; }
 
             let claimUser = await UserUtils.getUserByDiscordId(i.user.id);
-            const cooldowns = await UserUtils.getCooldowns(user);
+            let cooldowns = await UserUtils.getCooldowns(claimUser);
+            let permissionLevel = await UserUtils.getPermissionLevel(i.member);
             if (cooldowns.pullCooldown > 0 && permissionLevel < 2) {
                 i.reply({
                     content: `You can claim more cards in ${Math.floor((cooldowns.pullCooldown % 3600000) / 60000)} minutes`,
@@ -91,7 +91,7 @@ module.exports = {
             if (claimUser) {
                 //Update card with the user id
                 cards[cardId].userId = claimUser.id;
-                await UserUtils.setCooldown(user, "pull", await GeneralUtils.getBotProperty("pullTimeout"));
+                await UserUtils.setCooldown(claimUser, "pull", await GeneralUtils.getBotProperty("pullTimeout"));
                 await cards[cardId].save();
                 
                 //fetch character name from database given the character id
