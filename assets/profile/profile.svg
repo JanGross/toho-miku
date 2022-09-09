@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 600 300" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
+    <path id="BG" d="M600,6.097C600,2.732 597.268,0 593.903,0L6.097,0C2.732,0 0,2.732 0,6.097L0,293.903C0,297.268 2.732,300 6.097,300L593.903,300C597.268,300 600,297.268 600,293.903L600,6.097ZM13.189,42.808L163.189,42.808L163.189,292.808L13.189,292.808L13.189,42.808ZM267.866,150L352.866,150L352.866,291.667L267.866,291.667L267.866,150ZM175,150L260,150L260,291.667L175,291.667L175,150ZM360.366,150L445.366,150L445.366,291.667L360.366,291.667L360.366,150Z" style="fill:rgb(61,61,61);"/>
+    <g id="BADGES" transform="matrix(0.511675,0,0,0.501053,-25.2132,12.3596)">
+        <path d="M1180.85,291.997C1180.85,282.452 1173.27,274.702 1163.92,274.702L953.493,274.702C944.146,274.702 936.558,282.452 936.558,291.997L936.558,540.146C936.558,549.691 944.146,557.44 953.493,557.44L1163.92,557.44C1173.27,557.44 1180.85,549.691 1180.85,540.146L1180.85,291.997Z" style="fill:rgb(235,235,235);"/>
+        <clipPath id="_clip1">
+            <path d="M1180.85,291.997C1180.85,282.452 1173.27,274.702 1163.92,274.702L953.493,274.702C944.146,274.702 936.558,282.452 936.558,291.997L936.558,540.146C936.558,549.691 944.146,557.44 953.493,557.44L1163.92,557.44C1173.27,557.44 1180.85,549.691 1180.85,540.146L1180.85,291.997Z"/>
+        </clipPath>
+        <g clip-path="url(#_clip1)">
+            <g id="BADGE4" transform="matrix(0.947115,0,0,0.978709,156.691,39.3895)">
+                <circle cx="1011.71" cy="460.218" r="51.587" style="fill:rgb(190,31,97);"/>
+            </g>
+            <g id="BADGE3" transform="matrix(0.947115,0,0,0.978709,44.3148,39.3895)">
+                <circle cx="1011.71" cy="460.218" r="51.587" style="fill:rgb(190,31,97);"/>
+            </g>
+            <g id="BADGE2" transform="matrix(0.947115,0,0,0.978709,156.691,-76.7351)">
+                <circle cx="1011.71" cy="460.218" r="51.587" style="fill:rgb(31,190,152);"/>
+            </g>
+            <g id="BADGE1" transform="matrix(0.947115,0,0,0.978709,44.3148,-76.7351)">
+                <circle cx="1011.71" cy="460.218" r="51.587" style="fill:rgb(190,31,97);"/>
+            </g>
+            <g transform="matrix(1.88492,0,0,1.92488,-876.093,-513.106)">
+                <text x="981.2px" y="424.752px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">Place for badges</text>
+            </g>
+        </g>
+    </g>
+    <g id="PROFILE" transform="matrix(0.5,0,0,0.5,5.68434e-14,0)">
+        <g id="BODY" transform="matrix(0.994765,0,0,1.386,-12.9709,-59.6438)">
+            <path d="M1177.13,71.893C1177.13,59.947 1163.62,50.248 1146.98,50.248L395.039,50.248C378.394,50.248 364.881,59.947 364.881,71.893L364.881,227.016C364.881,238.962 378.394,248.661 395.039,248.661L1146.98,248.661C1163.62,248.661 1177.13,238.962 1177.13,227.016L1177.13,71.893Z" style="fill:rgb(227,90,255);"/>
+            <clipPath id="_clip2">
+                <path d="M1177.13,71.893C1177.13,59.947 1163.62,50.248 1146.98,50.248L395.039,50.248C378.394,50.248 364.881,59.947 364.881,71.893L364.881,227.016C364.881,238.962 378.394,248.661 395.039,248.661L1146.98,248.661C1163.62,248.661 1177.13,238.962 1177.13,227.016L1177.13,71.893Z"/>
+            </clipPath>
+            <g clip-path="url(#_clip2)">
+                <g transform="matrix(1.25332,0,0,0.899538,-99.307,18.6818)">
+                    <text x="387.202px" y="163.095px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">special badges</text>
+                    <text x="387.202px" y="175.488px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">BET<tspan x="409.65px " y="175.488px ">A</tspan></text>
+                    <text x="387.202px" y="187.88px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">MOD</text>
+                    <text x="387.202px" y="200.273px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">DEV</text>
+                    <text x="387.202px" y="212.666px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">CONTRIB</text>
+                </g>
+                <g transform="matrix(2.31555,0,0,1.66192,-505.061,-60.4179)">
+                    <text x="443.006px" y="119.692px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">{{PROFILE_TEXT}}</text>
+                </g>
+            </g>
+        </g>
+        <g id="HEADER" transform="matrix(0.994765,0,0,0.3276,-12.9709,-6.46125)">
+            <path d="M1177.13,141.823C1177.13,91.281 1163.62,50.248 1146.98,50.248L395.039,50.248C378.394,50.248 364.881,91.281 364.881,141.823L364.881,248.661L1177.13,248.661L1177.13,141.823Z" style="fill:rgb(255,79,79);"/>
+            <clipPath id="_clip3">
+                <path d="M1177.13,141.823C1177.13,91.281 1163.62,50.248 1146.98,50.248L395.039,50.248C378.394,50.248 364.881,91.281 364.881,141.823L364.881,248.661L1177.13,248.661L1177.13,141.823Z"/>
+            </clipPath>
+            <g clip-path="url(#_clip3)">
+                <g transform="matrix(1.87138,0,0,5.68249,-1010.59,-70.3181)">
+                    <text x="919.196px" y="41.567px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">{{CARD_COUNT}}</text>
+                </g>
+                <g transform="matrix(1.87138,0,0,5.68249,-805.016,-69.8361)">
+                    <text x="919.196px" y="41.567px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">{{CUR_1}}</text>
+                </g>
+                <g transform="matrix(1.87138,0,0,5.68249,-685.945,-69.8361)">
+                    <text x="919.196px" y="41.567px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">{{CUR_2}}</text>
+                </g>
+            </g>
+        </g>
+        <g id="USER_IMAGE" transform="matrix(0.853333,0,0,0.853333,73.7407,8.57671)">
+            <circle cx="399.913" cy="77.84" r="58.594" style="fill:rgb(79,255,171);"/>
+        </g>
+    </g>
+    <g transform="matrix(1.42884,0,0,1.42884,-37.6688,-779.829)">
+        <text x="44.839px" y="563.641px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">{{USERNAME}}</text>
+    </g>
+</svg>
