@@ -12,6 +12,12 @@ module.exports = {
                     .setName("feature")
                     .setDescription("The command to debug")
                     .setRequired(false)
+                )
+            .addStringOption((option) =>
+                option
+                    .setName("userid")
+                    .setDescription("Discord ID")
+                    .setRequired(false)
                 ),
     permissionLevel: 2,
     async execute(interaction) {
@@ -63,11 +69,12 @@ module.exports = {
             });
             break;
         case "reset_cd":
-            await UserUtils.setCooldown(user, "pull", 1);
-            await UserUtils.setCooldown(user, "drop", 1);
-            await UserUtils.setCooldown(user, "daily", 1);
+            let extUser = await UserUtils.getUserByDiscordId(interaction.options.getString("userid"));
+            await UserUtils.setCooldown(extUser, "pull", 1);
+            await UserUtils.setCooldown(extUser, "drop", 1);
+            await UserUtils.setCooldown(extUser, "daily", 1);
             interaction.reply({
-                content: `Reset cooldowns`,
+                content: `Reset cooldowns for <@${extUser.discordId}>`,
                 ephemeral: false
             });
             break;
