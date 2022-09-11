@@ -27,7 +27,10 @@ module.exports = {
             if (card) {
                 let cardImage = await Rendering.renderCard(card);
                 renderedCards.push(cardImage);
+            } else {
+                renderedCards.push('/app/assets/cards/missing_image.png');
             }
+
         }
 
         let profileImage = await Compositing.renderProfile(profile, profileTemplate, renderedCards);
