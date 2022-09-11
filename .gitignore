@@ -4,6 +4,8 @@
 
 ### Project ###
 assets/image_cache
+assets/cards
+assets/import
 
 ### Visual Studio Code ###
 .vscode 
