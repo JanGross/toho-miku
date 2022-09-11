@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   bot:
-    image: node:16.9.0-alpine
+    build: .
     command: sh -c "npm config set cache /app/.npm_cache --global && npm install && node ."
     restart: unless-stopped
     environment:
