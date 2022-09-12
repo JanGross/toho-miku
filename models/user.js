@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
     level() {
-      let currentLevel = Math.ceil(levelModifier * Math.sqrt(this.experience));
+      let currentLevel = Math.floor(levelModifier * Math.sqrt(this.experience));
       let nextLevelExperience = Math.pow((currentLevel + 1) / levelModifier, 2);
       let remaining = nextLevelExperience - this.experience;
       return {
