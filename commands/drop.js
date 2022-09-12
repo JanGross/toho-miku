@@ -61,6 +61,8 @@ module.exports = {
 					.setStyle(ButtonStyle.Primary),
 			);            
         }
+        //add 10 experience to the user
+        await user.addExperience(10);
 
         const file = new AttachmentBuilder(deckImage);
     
@@ -93,7 +95,7 @@ module.exports = {
                 cards[cardId].userId = claimUser.id;
                 await UserUtils.setCooldown(claimUser, "pull", await GeneralUtils.getBotProperty("pullTimeout"));
                 await cards[cardId].save();
-                
+                await claimUser.addExperience(5);
                 //fetch character name from database given the character id
                 let character = await Character.findOne({
                     attributes: ["name"],

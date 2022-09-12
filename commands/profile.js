@@ -20,7 +20,7 @@ module.exports = {
         profileTemplate = profileTemplate.replace(/{{USERNAME}}/g, interaction.member.displayName.substr(0,15)+(interaction.member.displayName.length>15?'...':''));
         profileTemplate = profileTemplate.replace(/{{HEADER_COLOR}}/g, '190,31,97');
         profileTemplate = profileTemplate.replace(/{{CC}}/g, await Card.count({where: {userId: user.id}}));
-        profileTemplate = profileTemplate.replace(/{{LVL}}/g, "0");
+        profileTemplate = profileTemplate.replace(/{{LVL}}/g, await user.getLevel());
 
         let slots = ['slotOne', 'slotTwo', 'slotThree', 'slotFour'];
         let renderedCards = [];

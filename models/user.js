@@ -15,6 +15,15 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Card);
       User.hasOne(models.Profile);
     }
+    async addExperience(amount) {
+      console.log(`Adding ${amount} experience to user ${this.id}`);
+      await this.update({
+          experience: this.experience + amount
+      });
+    }
+    async getLevel() {
+      return Math.ceil(0.5 * Math.sqrt(this.experience));
+    }
     //instance methods
     async getCardsWithCharactersCounted() {
       let cards = await sequelize.models.Card.findAndCountAll({
@@ -39,6 +48,7 @@ module.exports = (sequelize, DataTypes) => {
     discordId: DataTypes.BIGINT,
     active: DataTypes.INTEGER,
     privacy: DataTypes.INTEGER,
+    experience: DataTypes.INTEGER,
     nextDrop: DataTypes.DATE,
     nextPull: DataTypes.DATE,
     nextDaily: DataTypes.DATE
