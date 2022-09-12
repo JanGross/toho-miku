@@ -17,7 +17,7 @@ module.exports = {
         let profile = await user.getProfile();
 
         let profileTemplate = fs.readFileSync('/app/assets/profile/profile.svg').toString();
-        profileTemplate = profileTemplate.replace(/{{USERNAME}}/g, interaction.member.user.username);
+        profileTemplate = profileTemplate.replace(/{{USERNAME}}/g, interaction.member.displayName.substr(0,15)+(interaction.member.displayName.length>15?'...':''));
         profileTemplate = profileTemplate.replace(/{{HEADER_COLOR}}/g, '190,31,97');
 
         let slots = ['slotOne', 'slotTwo', 'slotThree', 'slotFour'];

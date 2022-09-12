@@ -7,7 +7,7 @@ const { Card } = require('../models');
 module.exports = {
     name: "Compositing",
     renderProfile: async function(profile, svgTemplate, renderedCards) {
-        let hash = crypto.createHash('md5').update(JSON.stringify(profile)).digest('hex');
+        let hash = crypto.createHash('md5').update(JSON.stringify(profile) + svgTemplate).digest('hex');
 
         let outFile = `/app/assets/image_cache/profiles/${hash}.gif`;
         console.log('Rendering profile to ' + outFile);
