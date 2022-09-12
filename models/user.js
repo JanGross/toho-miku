@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     async addExperience(amount) {
       console.log(`Adding ${amount} experience to user ${this.id}`);
       await this.update({
-          experience: this.experience + amount
+          experience: this.experience + parseInt(amount)
       });
     }
     async getLevel() {
