@@ -19,6 +19,8 @@ module.exports = {
         let profileTemplate = fs.readFileSync('/app/assets/profile/profile.svg').toString();
         profileTemplate = profileTemplate.replace(/{{USERNAME}}/g, interaction.member.displayName.substr(0,15)+(interaction.member.displayName.length>15?'...':''));
         profileTemplate = profileTemplate.replace(/{{HEADER_COLOR}}/g, '190,31,97');
+        profileTemplate = profileTemplate.replace(/{{CC}}/g, await Card.count({where: {userId: user.id}}));
+        profileTemplate = profileTemplate.replace(/{{LVL}}/g, "0");
 
         let slots = ['slotOne', 'slotTwo', 'slotThree', 'slotFour'];
         let renderedCards = [];
