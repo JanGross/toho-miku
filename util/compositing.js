@@ -6,14 +6,14 @@ const { Card } = require('../models');
 //TODO: Handle missing images
 module.exports = {
     name: "Compositing",
-    renderProfile: async function(profile, svgTemplate, renderedCards) {
-        let hash = crypto.createHash('md5').update(JSON.stringify(profile) + svgTemplate).digest('hex');
+    renderProfile: async function(profile, background, renderedCards) {
+        let hash = crypto.createHash('md5').update(JSON.stringify(profile) + background).digest('hex');
 
         let outFile = `/app/assets/image_cache/profiles/${hash}.gif`;
         console.log('Rendering profile to ' + outFile);
 
         //composite {overlay} {background} [{mask}] [-compose {method}]   {result}
-        let args =  ['svg:-', 'null:',
+        let args =  ['png:-', 'null:',
                         '\(', `${renderedCards[0]}`, '-coalesce', '\)',
                         '-geometry', '+25+85', '-compose', 'over', '-layers', 'composite', 
                         'null:', '\(', `${renderedCards[1]}`, '-coalesce', '-resize', '170x283', '\)',
@@ -27,7 +27,7 @@ module.exports = {
         console.log('GM Args: ' + args);
 
         const composite = spawn('convert', args);
-        composite.stdin.write(svgTemplate);
+        composite.stdin.write(background);
         composite.stdin.end();
         
         composite.stderr.on('data', (data) => {

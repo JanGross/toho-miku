@@ -41,7 +41,7 @@
                     <text x="387.202px" y="200.273px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">DEV</text>
                     <text x="387.202px" y="212.666px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">CONTRIB</text>
                 </g>
-                <g transform="matrix(2.31555,0,0,1.66192,-505.061,-60.4179)">
+                <g transform="matrix(2.31555,0,0,1.66192,-505.061,-78.2437)">
                     <text x="443.006px" y="119.692px" style="font-family:'ArialMT', 'Arial', sans-serif;font-size:12px;">{{PROFILE_TEXT}}</text>
                 </g>
             </g>
@@ -72,7 +72,7 @@
         <g transform="matrix(0.166016,0,0,0.166016,499.979,0.476193)">
             <use xlink:href="#_Image5" x="0" y="0" width="512px" height="512px"/>
         </g>
-        <g id="USER_IMAGE" transform="matrix(0.853333,0,0,0.853333,73.7407,8.57671)">
+        <g id="USER_IMAGE" transform="matrix(1.09227,0,0,1.09227,-12.8119,-1.02181)">
             <circle cx="399.913" cy="77.84" r="58.594" style="fill:rgb(79,255,171);"/>
         </g>
     </g>

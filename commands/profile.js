@@ -1,6 +1,8 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { Card, User, Character } = require("../models");
 const { UserUtils, Compositing, Rendering } = require("../util");
+const axios = require("axios");
+const sharp = require("sharp");
 const fs = require('fs');
 
 const pageSize = 8;
@@ -34,6 +36,16 @@ module.exports = {
         profileTemplate = profileTemplate.replace(/{{CC}}/g, await Card.count({where: {userId: user.id}}));
         profileTemplate = profileTemplate.replace(/{{LVL}}/g, await user.level().currentLevel);
 
+        let userImageBuffer = await axios.get(discordUser.displayAvatarURL({format: 'png', size: 128}), { responseType: 'arraybuffer' });
+        userImage = await sharp(userImageBuffer.data);
+        const rect = new Buffer.from(
+            '<svg><rect x="0" y="0" width="128" height="128" rx="100%" ry="100%"/></svg>'
+        );
+        userImage = await userImage.composite([{input: rect, blend: 'dest-in' }]).png().toBuffer();
+
+        let background = await sharp(Buffer.from(profileTemplate, 'utf8'))
+            .composite([{ input: userImage, left: 360, top: 20 }]).png().toBuffer();
+
         let slots = ['slotOne', 'slotTwo', 'slotThree', 'slotFour'];
         let renderedCards = [];
         for (slot of slots) {
@@ -47,7 +59,7 @@ module.exports = {
 
         }
 
-        let profileImage = await Compositing.renderProfile(profile, profileTemplate, renderedCards);
+        let profileImage = await Compositing.renderProfile(profile, background, renderedCards);
         await interaction.editReply({ files: [profileImage] });
     }
 }
