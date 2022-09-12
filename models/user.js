@@ -3,6 +3,8 @@ const {
   Model
 } = require('sequelize');
 
+const levelModifier = 0.5;
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -21,8 +23,23 @@ module.exports = (sequelize, DataTypes) => {
           experience: this.experience + parseInt(amount)
       });
     }
-    async getLevel() {
-      return Math.ceil(0.5 * Math.sqrt(this.experience));
+    level() {
+      let currentLevel = Math.ceil(levelModifier * Math.sqrt(this.experience));
+      let nextLevelExperience = Math.pow((currentLevel + 1) / levelModifier, 2);
+      let remaining = nextLevelExperience - this.experience;
+      return {
+          currentLevel: currentLevel,
+          currentExperience: this.experience,
+          nextLevelExperience: nextLevelExperience,
+          remaining: remaining
+      };
+    }
+    async cards() {
+      return await sequelize.models.Card.findAndCountAll({
+        where: {
+          userId: this.id
+        }
+      });
     }
     //instance methods
     async getCardsWithCharactersCounted() {
