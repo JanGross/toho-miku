@@ -18,7 +18,7 @@ module.exports = {
                 ),
     async execute(interaction) {
         await interaction.deferReply();
-        let discordUser = interaction.options.getUser("user") ? interaction.options.getUser("user") : interaction.member;
+        let discordUser = interaction.options.getUser("user") ? interaction.options.getUser("user") : interaction.member.user;
         let user = await UserUtils.getUserByDiscordId(discordUser.id);
 
         let profile = await user.getProfile();
