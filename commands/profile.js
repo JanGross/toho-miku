@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { SlashCommandBuilder, MessageAttachment, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { Card, User, Character } = require("../models");
 const { UserUtils, Compositing, Rendering } = require("../util");
 const axios = require("axios");
@@ -19,7 +19,8 @@ module.exports = {
                     .setRequired(false)
                 ),
     async execute(interaction) {
-        await interaction.deferReply();
+        await interaction.reply({ files:[ 'https://cdn.discordapp.com/attachments/856904078754971658/1019009533470842930/rendering-placeholder.gif']});
+
         let discordUser = interaction.options.getUser("user") ? interaction.options.getUser("user") : interaction.member.user;
         let user = await UserUtils.getUserByDiscordId(discordUser.id);
 
