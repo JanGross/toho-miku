@@ -9,15 +9,22 @@ const pageSize = 8;
 module.exports = {
     data: new SlashCommandBuilder()
             .setName("profile")
-            .setDescription("View your profile"),
+            .setDescription("View your profile")
+            .addUserOption((option) =>
+                option
+                    .setName("user")
+                    .setDescription("View someone else's profile")
+                    .setRequired(false)
+                ),
     async execute(interaction) {
         await interaction.deferReply();
-        let user = await UserUtils.getUserByDiscordId(interaction.member.id);
+        let discordUser = interaction.options.getUser("user") ? interaction.options.getUser("user") : interaction.member;
+        let user = await UserUtils.getUserByDiscordId(discordUser.id);
 
         let profile = await user.getProfile();
 
         let profileTemplate = fs.readFileSync('/app/assets/profile/profile.svg').toString();
-        profileTemplate = profileTemplate.replace(/{{USERNAME}}/g, interaction.member.displayName.substr(0,15)+(interaction.member.displayName.length>15?'...':''));
+        profileTemplate = profileTemplate.replace(/{{USERNAME}}/g, discordUser.username.substr(0,15)+(discordUser.username.length>15?'...':''));
         profileTemplate = profileTemplate.replace(/{{HEADER_COLOR}}/g, '190,31,97');
         profileTemplate = profileTemplate.replace(/{{CC}}/g, await Card.count({where: {userId: user.id}}));
         profileTemplate = profileTemplate.replace(/{{LVL}}/g, await user.getLevel());
