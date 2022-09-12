@@ -23,7 +23,7 @@ module.exports = {
 
         let profile = await user.getProfile();
 
-        let customStatus = profile.customStatus;
+        let customStatus = profile.customStatus ? profile.customStatus : "A Band Bot user";
         
         customStatus = customStatus.replace(/(.{0,40}[\s])/g, '<tspan x="443" dy="1.2em">$1</tspan>');
 
