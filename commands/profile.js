@@ -32,7 +32,7 @@ module.exports = {
         profileTemplate = profileTemplate.replace(/{{PROFILE_TEXT}}/g, customStatus );
         profileTemplate = profileTemplate.replace(/{{HEADER_COLOR}}/g, '190,31,97');
         profileTemplate = profileTemplate.replace(/{{CC}}/g, await Card.count({where: {userId: user.id}}));
-        profileTemplate = profileTemplate.replace(/{{LVL}}/g, await user.getLevel());
+        profileTemplate = profileTemplate.replace(/{{LVL}}/g, await user.level().currentLevel);
 
         let slots = ['slotOne', 'slotTwo', 'slotThree', 'slotFour'];
         let renderedCards = [];
