@@ -12,17 +12,44 @@ module.exports = {
                     .setName("feature")
                     .setDescription("The command to debug")
                     .setRequired(false)
+                    .addChoices(
+                        { name: 'ping', value: 'ping' },
+                        { name: 'ids', value: 'ids' },
+                        { name: 'clear_cards', value: 'clear_cards' },
+                        { name: 'cooldowns', value: 'cooldowns' },
+                        { name: 'bot', value: 'bot' },
+                        { name: 'reset_cd', value: 'reset_cd' },
+                        { name: 'add_xp', value: 'add_xp' },
+                    )
                 )
             .addStringOption((option) =>
                 option
                     .setName("userid")
                     .setDescription("Discord ID")
                     .setRequired(false)
+                )
+            .addUserOption((option) =>
+                option
+                    .setName("user")
+                    .setDescription("Discord User")
+                    .setRequired(false)
+                )
+            .addStringOption((option) =>
+                option
+                    .setName("value")
+                    .setDescription("some value")
+                    .setRequired(false)
                 ),
     permissionLevel: 2,
     async execute(interaction) {
         const identifier = CardUtils.generateIdentifier();
         let user = await UserUtils.getUserByDiscordId(interaction.member.id);
+        let extUser;
+        if(interaction.options.getUser("user")) {
+            extUser = await UserUtils.getUserByDiscordId(interaction.options.getUser("user").id);
+        } else if(interaction.options.getString("userid")) {
+            extUser = await UserUtils.getUserByDiscordId(interaction.options.getString("userid"));
+        }
         switch (interaction.options.getString("feature")) {
         case "ping":
             interaction.reply({
@@ -69,12 +96,18 @@ module.exports = {
             });
             break;
         case "reset_cd":
-            let extUser = await UserUtils.getUserByDiscordId(interaction.options.getString("userid"));
             await UserUtils.setCooldown(extUser, "pull", 1);
             await UserUtils.setCooldown(extUser, "drop", 1);
             await UserUtils.setCooldown(extUser, "daily", 1);
             interaction.reply({
                 content: `Reset cooldowns for <@${extUser.discordId}>`,
+                ephemeral: false
+            });
+            break;
+        case "add_xp":
+            await extUser.addExperience(interaction.options.getString("value"))
+            interaction.reply({
+                content: `Added ${interaction.options.getString("value")} XP to <@${extUser.discordId}>`,
                 ephemeral: false
             });
             break;
