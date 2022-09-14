@@ -12,6 +12,7 @@ module.exports = {
     async execute(interaction) {
         let user = await UserUtils.getUserByDiscordId(interaction.member.id);
         let offset = 0;
+        let groupDupes = false;
         const uid = interaction.id;
 
         let embed = new EmbedBuilder()
@@ -20,10 +21,10 @@ module.exports = {
             .setColor(0x00AE86);
 
         //add collector for pagination
-        const filter = (i) => i.customId === `previous-${uid}` || i.customId === `next-${uid}`;
+        const filter = (i) => i.customId.includes(uid);
         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
         
-        let row = this.getPaginateComponents(uid, prev=false);
+        let row = this.getPaginateComponents(uid, prev=false, groupDupes=groupDupes);
         
         let embedMessage = await interaction.reply({
             embeds: [embed],
@@ -32,10 +33,11 @@ module.exports = {
             fetchReply: true
         });
 
-        this.updatePageEmbed(uid, embedMessage, user, offset);  
+        this.updatePageEmbed(uid, embedMessage, user, offset, groupDupes);  
 
         collector.on('collect', async (i) => {
             i.deferUpdate();
+            console.log(`Collected ${i.customId}`);
             if (i.customId === `previous-${uid}`) {
                 //next
                 offset-=pageSize;
@@ -43,7 +45,10 @@ module.exports = {
                 //previous
                 offset+=pageSize;
             }
-            this.updatePageEmbed(uid, embedMessage, user, offset);
+            if (i.customId === `group-${uid}`) {
+                groupDupes = !groupDupes;
+            }
+            this.updatePageEmbed(uid, embedMessage, user, offset, groupDupes);
         });
 
         collector.on('end', collected => {
@@ -54,7 +59,7 @@ module.exports = {
 
     },
 
-    getPaginateComponents(uid, prev=true, next=true) {
+    getPaginateComponents(uid, prev=true, next=true, groupDupes=false) {
         //add buttons for pagination
         let row = new ActionRowBuilder();
         row.addComponents(
@@ -68,23 +73,47 @@ module.exports = {
             .setCustomId(`next-${uid}`)
             .setLabel(`Next`)
             .setStyle(ButtonStyle.Primary)
-            .setDisabled(!next)
+            .setDisabled(!next),
+
+            new ButtonBuilder()
+            .setCustomId(`group-${uid}`)
+            .setLabel(`Group Dupes`)
+            .setStyle(ButtonStyle.Primary)
+            .setEmoji(groupDupes ? "✅" : "❌")
         );
         return row;
     },
 
-    async updatePageEmbed(uid, i, user, offset) {
-        let cards = await Card.findAndCountAll({
-            where: {
-                userId: user.id
-            },
-            limit: pageSize,
-            offset: offset,
-            include: [{
-                model: Character,
-            }]
-        });
-
+    async updatePageEmbed(uid, i, user, offset, group) {
+        let cards
+        if (group)  {
+            cards = await Card.findAndCountAll({
+                where: {
+                    userId: user.id
+                },
+                group: ["characterId"],
+                attributes: ["characterId", [Card.sequelize.fn("COUNT", "characterId"), "count"]],
+                order: [[Card.sequelize.literal("count"), "DESC"]],
+                include: [{
+                    model: Character,
+                }],
+                limit: pageSize,
+                offset: offset
+            });
+            cards.count = cards.count.length;
+        } else {
+            cards = await Card.findAndCountAll({
+                where: {
+                    userId: user.id
+                },
+                limit: pageSize,
+                offset: offset,
+                include: [{
+                    model: Character,
+                }]
+            });
+        }
+        cards.rows = cards.rows ? cards.rows : cards;
         let pageStart = offset + 1;
         let pageEnd = offset + cards.rows.length;
 
@@ -105,18 +134,27 @@ module.exports = {
         //if the user has cards, list them
         for (let i = 0; i < cards.rows.length; i++) {
             let card = cards.rows[i];
-            embed.addFields({
-                inline: true,
-                name: `${i+offset+1}:[${card.identifier}] ${card.Character.name}`,
-                value: `P: ${card.printNr} Q: ${card.quality}`
-            });
+            if (group) {
+                embed.addFields({ 
+                    name: `[${card.Character.id}] ${card.Character.name}`,
+                    value: `${card.dataValues.count} in collection`,
+                    inline: true
+                });
+            }
+            if (!group) {
+                embed.addFields({
+                    inline: true,
+                    name: `${i+offset+1} [${card.identifier}] ${card.Character.name}`,
+                    value: `Print: ${card.printNr} Quality: ${card.quality}\nCollected: ${new Date(card.createdAt).toLocaleDateString('en-GB', { timeZone: 'UTC' })}`
+                });
+            }
 
             //Add a blank field every two items to force two columns
             if (i % 2 === 1) {
                 embed.addFields({ name:'\u200b', value: '\u200b'});
             }
         }
-        let components = this.getPaginateComponents(uid, prev=offset>0, next=pageEnd<cards.count);
+        let components = this.getPaginateComponents(uid, prev=offset>0, next=pageEnd<cards.count, groupDupes=group);
         await i.edit({ embeds: [embed], components: [components] });
     }
 }
