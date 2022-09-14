@@ -103,8 +103,8 @@ module.exports = {
                         id: cards[cardId].characterId
                     }
                 });
-                let reply = await i.reply({ content: `${i.user} (${claimUser.id}) claimed a card! [${cards[cardId].identifier}]`, ephemeral: false, fetchReply: true  });
-                collectionReplies.push({ ref: reply, characterName: character.name });
+                let reply = await i.reply({ content: `${i.user} (${claimUser.id}) claimed a card!  [${cards[cardId].identifier}]`, ephemeral: false, fetchReply: true  });
+                collectionReplies.push({ ref: reply, characterName: character.name, card: cards[cardId] });
                 let newRow = ReplyUtils.recreateComponents(i.message.components);
                 newRow.components[cardId].setLabel("Claimed");
                 newRow.components[cardId].setStyle(ButtonStyle.Success);
@@ -118,7 +118,11 @@ module.exports = {
             let dropHistory = {};
             for (reply of collectionReplies) {
                 //TODO: strings shouldn't be inlined. Needs refactoring
-                reply.ref.edit({ content: `${reply.ref.content.replace('a card', reply.characterName)}` });
+                let notableProps = [];
+                if (reply.card.printNr == 1) notableProps.push("📦 First Print");
+                if (reply.card.quality == 6) notableProps.push("<a:sparklu:1019505245572837428> Shiny");
+
+                reply.ref.edit({ content: `${reply.ref.content.replace('a card', reply.characterName)} ${notableProps.join()}` });
             }
             console.log(`Collected ${collected.size} interactions.`);
             for (let card of cards) {
