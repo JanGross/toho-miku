@@ -102,7 +102,7 @@ module.exports = {
                         await m.reply({ content: "An invalid image has been attached", ephemeral: true });
                         return;
                     }
-                    let identifier = `${record.Band.name}/${image.name}`;
+                    let identifier = `${record.Band.name.replace(" ", "_")}/${image.name}`;
                     let path = `/app/assets/cards/${identifier}`;
                     await this.downloadImage(image.attachment, path);
                     await this.updateRecord(user, record, option, identifier);
