@@ -73,13 +73,5 @@ module.exports = {
             });
             return;
         }
-        if (type === 'debug') {
-            interaction.editReply({
-                content: 'Debug DEBUG',
-                ephemeral: true
-            });
-            return;
-        }
-
     }
 }
