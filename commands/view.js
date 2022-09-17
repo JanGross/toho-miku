@@ -155,7 +155,7 @@ module.exports = {
         collector.on('collect', async (m) => {
             console.log(`Collected ${m.customId}`);
             if (m.customId === `edit-char-${character.id}`) {
-                await m.reply({ content: "Editing not implemented", ephemeral: true });
+                await edit.execute(m, 'character', character.id);
             }
         });
     }

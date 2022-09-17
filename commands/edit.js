@@ -31,15 +31,15 @@ module.exports = {
                     .setRequired(false)
                 ),
     permissionLevel: 2,
-    async execute(interaction) {
+    async execute(interaction, type=undefined, id=undefined) {
         await interaction.deferReply();
         let user = await UserUtils.getUserByDiscordId(interaction.member.id);
 
         let options = [];
         let record;
-        switch (interaction.options.getString("type")) {
+        switch (interaction.options?.getString("type") ?? type) {
         case "character":
-            record = await Character.findByPk(interaction.options.getString("id"), { include: Band });
+            record = await Character.findByPk(interaction.options?.getString("id") ?? id, { include: Band });
             if (!record) {
                 interaction.editReply({ content: "Character not found" });
                 return;
