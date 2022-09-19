@@ -2,11 +2,18 @@ require("dotenv").config();
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v10")
 const { Guild, User } = require("../models");
-const { UserUtils } = require("../util");
+const { UserUtils, GeneralUtils } = require("../util");
 
 module.exports = {
     name: "interactionCreate",
     async execute (interaction) {
+        let isMaintenance = await GeneralUtils.getBotProperty("maintenance");
+        let permissionLevel = await UserUtils.getPermissionLevel(interaction.member);
+        
+        if (isMaintenance && permissionLevel < 2) {
+            return interaction.reply({ content: "The bot is currently undergoing maintenance. Please try again later.", ephemeral: true });
+        }
+
         let isRegistered = await UserUtils.registrationCheck(interaction);
         if (!isRegistered) return;
         console.log("User is registered");
@@ -41,7 +48,6 @@ module.exports = {
         //check if user has permissions to run the command
         //TODO: pass down this user object to avoid duplicate queries
         let user = await UserUtils.getUserByDiscordId(interaction.member.id);
-        let permissionLevel = await UserUtils.getPermissionLevel(interaction.member);
         if (command.permissionLevel > permissionLevel) {
             interaction.reply({
                 content: `You do not have permission to run this command`,

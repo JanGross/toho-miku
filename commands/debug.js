@@ -20,6 +20,7 @@ module.exports = {
                         { name: 'bot', value: 'bot' },
                         { name: 'reset_cd', value: 'reset_cd' },
                         { name: 'add_xp', value: 'add_xp' },
+                        { name: 'toggle_maintenance', value: 'toggle_maintenance' },
                     )
                 )
             .addStringOption((option) =>
@@ -108,6 +109,14 @@ module.exports = {
             await extUser.addExperience(interaction.options.getString("value"))
             interaction.reply({
                 content: `Added ${interaction.options.getString("value")} XP to <@${extUser.discordId}>`,
+                ephemeral: false
+            });
+            break;
+        case "toggle_maintenance":
+            let maintenance = await GeneralUtils.getBotProperty("maintenance");
+            await GeneralUtils.setBotProperty("maintenance", !maintenance);
+            interaction.reply({
+                content: `Maintenance mode is now ${!maintenance}`,
                 ephemeral: false
             });
             break;
