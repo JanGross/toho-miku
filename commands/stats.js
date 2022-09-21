@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { UserUtils } = require('../util');
-
+const { QUALITY, QUALITY_NAMES } = require('../config/constants');
 module.exports = {
     data: new SlashCommandBuilder()
             .setName("stats")
@@ -21,7 +21,7 @@ module.exports = {
         let userCards = await user.cards();
 
         let qualityCount = Array(6).fill(0);
-        let qualities = ['Bad', 'Okay', 'Good', 'Great', 'Epic', 'Shiny'];
+        let qualities = Object.values(QUALITY_NAMES);
         for (card of userCards.rows) {
             qualityCount[card.quality-1]++;
         }
