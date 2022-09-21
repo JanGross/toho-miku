@@ -14,7 +14,8 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   DropHistory.init({
-    dropData: DataTypes.JSON
+    dropData: DataTypes.JSON,
+    type: DataTypes.INTEGER
   }, {
     sequelize,
     modelName: 'DropHistory',

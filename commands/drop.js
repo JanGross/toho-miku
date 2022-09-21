@@ -92,6 +92,25 @@ module.exports = {
     
         const message = await interaction.editReply({ content: 'asd', components: [row], files: [file], fetchReply: true });
 
+        let dropHistory = {
+            dropper: user.id,
+            guild: interaction.guild.id,
+            channel: interaction.channel.id,
+            messageId: message.id,
+        };
+        for (let card of cards) {
+            let historyEntry = {
+                cardData: JSON.stringify(card)
+            };
+            dropHistory[card.identifier] = historyEntry;   
+        }
+
+        //create new drop history entry
+        let history = await DropHistory.create({
+            dropData: JSON.stringify(dropHistory),
+            type: 0
+        });
+
 		//const message = await interaction.editReply({ content: reply, components: [row], fetchReply: true });
         //set users drop cooldown
         await UserUtils.setCooldown(user, "drop", await GeneralUtils.getBotProperty("dropTimeout"));
@@ -119,6 +138,15 @@ module.exports = {
                 cards[cardId].userId = claimUser.id;
                 await UserUtils.setCooldown(claimUser, "pull", await GeneralUtils.getBotProperty("pullTimeout"));
                 await cards[cardId].save();
+                let historyEntry = {
+                    userId: claimUser.id,
+                    cardId: cards[cardId].id,
+                    dropMessageId: message.id
+                }
+                await DropHistory.create({
+                    dropData: JSON.stringify(historyEntry),
+                    type: 1
+                });
                 await claimUser.addExperience(5);
                 //fetch character name from database given the character id
                 let character = await Character.findOne({
@@ -139,7 +167,12 @@ module.exports = {
         });
         
         collector.on('end', async collected => {
-            let dropHistory = {};
+            for (let card of cards) {
+                if (!card.userId) {
+                    card.userId = 1;
+                    await card.save();
+                }
+            }
             for (reply of collectionReplies) {
                 //TODO: strings shouldn't be inlined. Needs refactoring
                 let notableProps = [];
@@ -149,23 +182,6 @@ module.exports = {
                 reply.ref.edit({ content: `${reply.ref.content.replace('a card', reply.characterName)} ${notableProps.join()}` });
             }
             console.log(`Collected ${collected.size} interactions.`);
-            for (let card of cards) {
-                if (!card.userId) {
-                    card.userId = 1;
-                    await card.save();
-                }
-                let historyEntry = {
-                    cardData: JSON.stringify(card),
-                    ogUserId: card.userId,
-                };
-                dropHistory[card.identifier] = historyEntry;
-            }
-
-            //create new drop history entry
-            let history = await DropHistory.create({
-                dropData: JSON.stringify(dropHistory),
-            });
-
 
             
             let deckImage = await Rendering.renderCardStack(cards);
