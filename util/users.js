@@ -48,9 +48,13 @@ module.exports = {
             reply[`next${key}Timestamp`] = user[`next${key}`].getTime();
             let cooldown = Math.max(reply[`next${key}Timestamp`] - reply['now'], 0);
             reply[`${key.toLowerCase()}Cooldown`] = cooldown;
+            let hours = Math.floor(cooldown / 3600000);
+            let minutes = Math.floor((cooldown % 3600000) / 60000);
+            let seconds = Math.floor((cooldown % 60000) / 1000);
             if (cooldown > 0) {
-                reply[`${key.toLowerCase()}CooldownFormatted`] = `Next ${key} in ${Math.floor(cooldown / 3600000)} hours ` + 
-                                                                `and ${Math.floor((cooldown % 3600000) / 60000)} minutes`;
+                reply[`${key.toLowerCase()}CooldownFormatted`] = `Next ${key} in ` + (hours >= 1 ? `${hours} hour${hours > 1 ? 's' : ''} ` : '') + 
+                                                                `${minutes} minute${minutes > 1 ? 's' : ''} ` +
+                                                                `${seconds} second${seconds > 1 ? 's' : ''}`;
             } else {
                 reply[`${key.toLowerCase()}CooldownFormatted`] = `${key} Ready!`;
             }
