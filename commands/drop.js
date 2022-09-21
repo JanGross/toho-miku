@@ -11,12 +11,13 @@ module.exports = {
     .setDescription("Drop a card"),
     
     async execute(interaction) {
+        await interaction.deferReply();
         const user = await UserUtils.getUserByDiscordId(interaction.member.id);
         
         let permissionLevel = await UserUtils.getPermissionLevel(interaction.member);
         const cooldowns = await UserUtils.getCooldowns(user);
         if (cooldowns.dropCooldown > 0 && permissionLevel < 2) {
-            interaction.reply({
+            interaction.editReply({
                 content: `You can drop more cards in ${Math.floor((cooldowns.dropCooldown % 3600000) / 60000)} minutes`,
                 ephemeral: false
             });
@@ -89,9 +90,9 @@ module.exports = {
 
         const file = new AttachmentBuilder(deckImage);
     
-        const message = await interaction.reply({ content: 'asd', components: [row], files: [file], fetchReply: true });
+        const message = await interaction.editReply({ content: 'asd', components: [row], files: [file], fetchReply: true });
 
-		//const message = await interaction.reply({ content: reply, components: [row], fetchReply: true });
+		//const message = await interaction.editReply({ content: reply, components: [row], fetchReply: true });
         //set users drop cooldown
         await UserUtils.setCooldown(user, "drop", await GeneralUtils.getBotProperty("dropTimeout"));
 
