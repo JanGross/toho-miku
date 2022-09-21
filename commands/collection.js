@@ -125,9 +125,11 @@ module.exports = {
             .setFooter({ text: `Cards ${pageStart} - ${pageEnd} / ${cards.count}` });
 
         //if the user has no cards, tell him
-        //BUGBUG: no longer working with the new embed flow
         if (cards.count === 0) {
             embed.setTitle("You have no cards in your collection");
+            embed.setDescription("Go and drop some with /drop");
+            embed.setFooter(null);
+            await i.edit({ embeds: [embed], components: [] });
             return;
         }
 
