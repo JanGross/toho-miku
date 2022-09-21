@@ -114,7 +114,7 @@ module.exports = {
             });
             break;
         case "add_xp":
-            await extUser.addExperience(interaction.options.getString("value"))
+            await extUser.addExperience(interaction.options.getString("value"), `Debug command ran by ${interaction.member.displayName}`);
             interaction.editReply({
                 content: `Added ${interaction.options.getString("value")} XP to <@${extUser.discordId}>`,
                 ephemeral: false

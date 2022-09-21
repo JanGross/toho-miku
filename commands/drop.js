@@ -86,7 +86,7 @@ module.exports = {
 			);            
         }
         //add 10 experience to the user
-        await user.addExperience(10);
+        await user.addExperience(10, 'drop');
 
         const file = new AttachmentBuilder(deckImage);
     
@@ -147,7 +147,7 @@ module.exports = {
                     dropData: JSON.stringify(historyEntry),
                     type: 1
                 });
-                await claimUser.addExperience(5);
+                await claimUser.addExperience(5, "claim");
                 //fetch character name from database given the character id
                 let character = await Character.findOne({
                     attributes: ["name"],

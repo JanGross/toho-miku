@@ -15,10 +15,18 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.hasMany(models.Card);
+      User.hasMany(models.CurrencyHistory);
       User.hasOne(models.Profile);
     }
-    async addExperience(amount) {
+    async addExperience(amount, source='unknown') {
       console.log(`Adding ${amount} experience to user ${this.id}`);
+      await sequelize.models.CurrencyHistory.create({
+        userId: this.id,
+        currency: 0,
+        delta: amount,
+        previous: this.experience,
+        source: source
+      });
       await this.update({
           experience: this.experience + parseInt(amount)
       });
