@@ -2,6 +2,7 @@ const { SlashCommandBuilder, ComponentType, ActionRowBuilder, ButtonBuilder, But
 const { customAlphabet } = require("nanoid");
 const { Card, User } = require("../models");
 const { UserUtils, CardUtils, GeneralUtils } = require("../util");
+require('dotenv').config();
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -43,6 +44,7 @@ module.exports = {
                 ),
     permissionLevel: 2,
     async execute(interaction) {
+        await interaction.deferReply();
         const identifier = CardUtils.generateIdentifier();
         let user = await UserUtils.getUserByDiscordId(interaction.member.id);
         let extUser;
@@ -53,7 +55,7 @@ module.exports = {
         }
         switch (interaction.options.getString("feature")) {
         case "ping":
-            interaction.reply({
+            interaction.editReply({
                 content: "Pong!",
                 ephemeral: true
             });
@@ -65,17 +67,23 @@ module.exports = {
                 console.log(nanoid());
                 ids.push(nanoid());
             }
-            interaction.reply({
+            interaction.editReply({
                 content: `${JSON.stringify(ids)}`,
                 ephemeral: false
             });
             break;
         case "clear_cards":
+            if (process.env.NODE_ENV === "production") {
+                interaction.editReply({
+                    content: "This command is disabled in production."
+                });
+                return;
+            }
             const cards = await Card.findAll();
             for (let i = 0; i < cards.length; i++) {
                 await cards[i].destroy();
             }
-            interaction.reply({
+            interaction.editReply({
                 content: `Cleared ${cards.length} cards`,
                 ephemeral: false
             });
@@ -84,14 +92,14 @@ module.exports = {
             const timeouts = await UserUtils.getCooldowns(user);
             console.log(`UserTimeouts: ${JSON.stringify(timeouts)}`);
             let timeoutInMinutes = 0;
-            interaction.reply({
+            interaction.editReply({
                 content: `\`\`\`${JSON.stringify(timeouts, null, 2)}\`\`\` `,
                 ephemeral: false
             });
             break;
         case "bot":
             let botProperties = await GeneralUtils.getBotProperty(null);
-            interaction.reply({
+            interaction.editReply({
                 content: `\`\`\`${JSON.stringify(botProperties, null, 2)}\`\`\` `,
                 ephemeral: false
             });
@@ -100,14 +108,14 @@ module.exports = {
             await UserUtils.setCooldown(extUser, "pull", 1);
             await UserUtils.setCooldown(extUser, "drop", 1);
             await UserUtils.setCooldown(extUser, "daily", 1);
-            interaction.reply({
+            interaction.editReply({
                 content: `Reset cooldowns for <@${extUser.discordId}>`,
                 ephemeral: false
             });
             break;
         case "add_xp":
             await extUser.addExperience(interaction.options.getString("value"))
-            interaction.reply({
+            interaction.editReply({
                 content: `Added ${interaction.options.getString("value")} XP to <@${extUser.discordId}>`,
                 ephemeral: false
             });
@@ -115,13 +123,13 @@ module.exports = {
         case "toggle_maintenance":
             let maintenance = await GeneralUtils.getBotProperty("maintenance");
             await GeneralUtils.setBotProperty("maintenance", !maintenance);
-            interaction.reply({
+            interaction.editReply({
                 content: `Maintenance mode is now ${!maintenance}`,
                 ephemeral: false
             });
             break;
         default:
-            interaction.reply({
+            interaction.editReply({
                 content: `Your permission level is ${await UserUtils.getPermissionLevel(interaction.member)}`,
                 ephemeral: false
             });
