@@ -54,7 +54,10 @@ module.exports = {
                 { model: User}
             ]
         });
-
+        if (card === null) {
+            interaction.editReply({ content: "Card not found" });
+            return;
+        }
         let cardImage = await Rendering.renderCard(card);
         //get base filename
         let filename = cardImage.split("/").pop();
