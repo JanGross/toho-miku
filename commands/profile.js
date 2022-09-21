@@ -26,9 +26,7 @@ module.exports = {
 
         let profile = await user.getProfile();
 
-        let customStatus = profile.customStatus ? profile.customStatus : "A Band Bot user";
-        
-        customStatus = customStatus.replace(/(.{0,40}[\s])/g, '<tspan x="443" dy="1.2em">$1</tspan>');
+        let customStatus = profile.customStatus.replace(/(.{0,40}[\s])/g, '<tspan x="443" dy="1.2em">$1</tspan>');
 
         let profileTemplate = fs.readFileSync('/app/assets/profile/profile.svg').toString();
         profileTemplate = profileTemplate.replace(/{{USERNAME}}/g, discordUser.username.substr(0,15)+(discordUser.username.length>15?'...':''));
