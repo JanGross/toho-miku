@@ -2,6 +2,7 @@ const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Compo
 const { Card, User, Character, DropHistory, sequelize } = require("../models");
 const { customAlphabet } = require("nanoid");
 const { CardUtils, UserUtils, ReplyUtils, GeneralUtils, Rendering } = require("../util");
+const { QUALITY } = require("../config/constants");
 const card = require("../models/card");
 
 module.exports = {
@@ -33,6 +34,28 @@ module.exports = {
         });
 
         for (let i = 0; i < 3; i++) {
+            //generate quality based on drop rate
+            let quality = undefined;
+            let roll = Math.random() * 100;
+            if (roll <= 45.0) {
+                quality = QUALITY.BAD; //45%
+            }
+            if (roll > 45.0) {
+                quality = QUALITY.OK; //25%
+            }
+            if (roll > 70.0) {
+                quality = QUALITY.GOOD; //15%
+            }
+            if (roll > 85.0) {
+                quality = QUALITY.GREAT; //10%
+            }
+            if (roll > 95.0) {
+            quality = QUALITY.EXCELLENT; //5%
+            }
+            if (roll > 99.9) {
+                quality = QUALITY.SHINY; //0.1%
+            }
+
             //get number of characters in database
             const characterId = characters[i].id
             console.log(`characterId: ${characterId}`);
@@ -40,7 +63,7 @@ module.exports = {
             let newCard = await Card.create({
                 characterId: characterId,
                 identifier: CardUtils.generateIdentifier(),
-                quality: Math.floor(Math.random() * 6) + 1,
+                quality: quality,
                 printNr: await CardUtils.getNextPrintNumber(characterId),
                 
             });
