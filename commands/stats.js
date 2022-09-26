@@ -44,6 +44,7 @@ module.exports = {
                 { name: "Cards owned", value: `${qualities.join('\n')}\n${totalCards} total - ${burnedCards} burned`, inline: true },
                 { name: "Level", value: `${level.currentLevel}`, inline: true },
                 { name: "Progress", value: `${level.currentExperience} / ${level.nextLevelExperience}\n${level.remaining} XP remaining`, inline: true },
+                { name: "Wallet", value: `${user.primaryCurrency} ${CURRENCY_SYMBOLS[1]}\n${user.secondaryCurrency} ${CURRENCY_SYMBOLS[2]}`, inline: true },
                 { name: "Registered since", value: `${registrationDate}`, inline: true }
                 )
             .setColor(0x00FF00);        

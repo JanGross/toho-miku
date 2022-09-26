@@ -1,6 +1,7 @@
 const { SlashCommandBuilder, AttachmentBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
 const { Card, User, Band, Character } = require("../models");
 const { Rendering, UserUtils } = require("../util");
+const { QUALITY_NAMES } = require("../config/constants");
 const fs = require("fs");
 const edit = require("./edit");
 
@@ -87,7 +88,7 @@ module.exports = {
                 { name: "Band", value: `${card.Character.Band.name}` },
                 { name: "Character ID", value: `${card.Character.id}` },
                 { name: 'Print Number', value: `${card.printNr}`, inline: true },
-                { name: 'Quality', value: `${card.quality}`, inline: true }
+                { name: 'Quality', value: `${QUALITY_NAMES[card.quality]} ${(card.quality === 6 ? '<a:sparklu:1019505245572837428>':'')}`, inline: true }
             )
             .setColor(0x00ff00)
             .setFooter({ text: `${card.identifier}`, iconURL: 'https://cdn.discordapp.com/attachments/856904078754971658/1017431187234508820/fp.png' })
