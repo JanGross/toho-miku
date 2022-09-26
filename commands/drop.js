@@ -75,22 +75,28 @@ module.exports = {
         
         const row = new ActionRowBuilder();
         let deckImage = await Rendering.renderCardStack(cards);
-
+        let notableProps = [];
         for (let i = 0; i < cards.length; i++) {
-            //Add claim button for each card
+            //Add claim button and notable prop text for each card
             row.addComponents(
 				new ButtonBuilder()
 					.setCustomId(`claim-${i}-${cards[i].identifier}`)
 					.setLabel(`Claim  ${i+1}`)
 					.setStyle(ButtonStyle.Primary),
-			);            
+			);
+            if (cards[i].quality == QUALITY.SHINY) {
+                notableProps.push(`<a:sparklu:1019505245572837428>`);
+            }
+            if (cards[i].printNr == 1) {
+                notableProps.push(`📦`);
+            }
         }
         //add 10 experience to the user
         await user.addExperience(10, 'drop');
 
         const file = new AttachmentBuilder(deckImage);
     
-        const message = await interaction.editReply({ content: 'asd', components: [row], files: [file], fetchReply: true });
+        const message = await interaction.editReply({ content: `${interaction.member} Dropped 3 cards.\n${notableProps.join(" ")}`, components: [row], files: [file], fetchReply: true });
 
         let dropHistory = {
             dropper: user.id,
