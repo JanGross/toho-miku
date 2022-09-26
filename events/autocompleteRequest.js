@@ -2,6 +2,8 @@ const { InteractionType } = require('discord.js');
 const { UserUtils } = require('../util');
 const { Card, Character, User } = require('../models');
 const Sequelize = require('sequelize');
+const { QUALITY_NAMES } = require('../config/constants');
+
 module.exports = {
     name: "interactionCreate",
     async execute (interaction) {
@@ -9,30 +11,21 @@ module.exports = {
         if (!isRegistered) return;
         if (interaction.type !== InteractionType.ApplicationCommandAutocomplete) return;
         console.log(`Autocomplete request from ${interaction.user.tag} (${interaction.user.id}) for ${interaction.commandName} with ${interaction.options.getFocused(true).value}`);
+        
+        let user = await UserUtils.getUserByDiscordId(interaction.member.id);
+        let focusedOption = interaction.options.getFocused(true);
+        let choices = [];
+        
+        if (interaction.commandName === "burn") {
+            choices = await this.fetchCards(focusedOption, { user: user, ownedOnly: true });
+        }
+
         if (interaction.commandName === 'view') {
             const viewType = interaction.options.getString('type');
-            let focusedOption = interaction.options.getFocused(true);
-            
-            let choices = [];
-            
+
             switch (viewType) {
                 case 'card':
-                    const cards = await Card.findAll({
-                        where: {
-                            identifier: {
-                                [Sequelize.Op.like]: `%${focusedOption.value}%`
-                            }
-                        },
-                        include: [{ model: Character }, { model: User }],
-                        limit: 10
-                    });
-                    for (let i = 0; i < cards.length; i++) {
-                        choices.push({
-                            name: `${cards[i].identifier} - ${cards[i].Character.name}`,
-                            value: cards[i].identifier
-                        });
-                    }
-                    break;
+                    choices = await this.fetchCards(focusedOption, { user: user});
                 case 'character':
                     if(focusedOption.value.length < 3) break;
                     const characters = await Character.findAll({
@@ -53,9 +46,39 @@ module.exports = {
                 case 'band':
                     break;
             }
-                
-            await interaction.respond(choices);
-            return;
         }
+        if (choices.length > 0) {
+            console.log(choices);
+            await interaction.respond(choices);
+        }
+        return;
+    },
+    async fetchCards (focusedOption, options={}) {
+        let choices = [];
+        let condition = {
+            where: {
+                identifier: {
+                    [Sequelize.Op.like]: `%${focusedOption.value}%`
+                },
+                burned: false
+            },
+            include: [{ model: Character }, { model: User }],
+            limit: 10
+        }
+        if (options.ownedOnly) {
+            condition.where.userId = { [Sequelize.Op.eq]: options.user.id };
+        }
+        const cards = await Card.findAll(condition);
+        for (let i = 0; i < cards.length; i++) {
+            let owned = "";
+            if (options.user) {
+                owned = cards[i].userId === options.user.id ? " (owned)" : "";
+            }
+            choices.push({
+                name: `${cards[i].identifier} - ${cards[i].Character.name} (${QUALITY_NAMES[cards[i].quality]})${owned}`,
+                value: cards[i].identifier
+            });
+        }
+        return choices;
     }
 }

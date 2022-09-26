@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     userId: DataTypes.INTEGER,
     imageHash: DataTypes.STRING,
     enabled:  { type: DataTypes.BOOLEAN, defaultValue: true },
+    burned: { type: DataTypes.BOOLEAN, defaultValue: false },
     printNr: DataTypes.INTEGER,
   }, {
     sequelize,

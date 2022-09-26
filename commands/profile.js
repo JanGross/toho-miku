@@ -51,7 +51,7 @@ module.exports = {
         let slots = ['slotOne', 'slotTwo', 'slotThree', 'slotFour'];
         let renderedCards = [];
         for (slot of slots) {
-            let card = await Card.findOne({ where: { id: profile[slot] }});
+            let card = await Card.findOne({ where: { id: profile[slot], burned: false } });
             if (card) {
                 let cardImage = await Rendering.renderCard(card);
                 renderedCards.push(cardImage);

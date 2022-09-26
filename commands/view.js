@@ -92,7 +92,10 @@ module.exports = {
             .setColor(0x00ff00)
             .setFooter({ text: `${card.identifier}`, iconURL: 'https://cdn.discordapp.com/attachments/856904078754971658/1017431187234508820/fp.png' })
             .setTimestamp(card.createdAt);
-
+        if (card.burned) {
+            embed.setColor(0xff0000);
+            embed.addFields({ name: "Burned", value: "This card has been burned" });
+        }
         const message = await interaction.editReply({ embeds: [embed], files: [cardImage], fetchReply: true });
     },
 

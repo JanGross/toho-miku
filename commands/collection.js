@@ -89,7 +89,8 @@ module.exports = {
         if (group)  {
             cards = await Card.findAndCountAll({
                 where: {
-                    userId: user.id
+                    userId: user.id,
+                    burned: false
                 },
                 group: ["characterId"],
                 attributes: ["characterId", [Card.sequelize.fn("COUNT", "characterId"), "count"]],
@@ -104,7 +105,8 @@ module.exports = {
         } else {
             cards = await Card.findAndCountAll({
                 where: {
-                    userId: user.id
+                    userId: user.id,
+                    burned: false
                 },
                 limit: pageSize,
                 offset: offset,

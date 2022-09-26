@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { UserUtils } = require('../util');
-const { QUALITY, QUALITY_NAMES } = require('../config/constants');
+const { CURRENCY_SYMBOLS, QUALITY_NAMES } = require('../config/constants');
 module.exports = {
     data: new SlashCommandBuilder()
             .setName("stats")
@@ -22,7 +22,15 @@ module.exports = {
 
         let qualityCount = Array(6).fill(0);
         let qualities = Object.values(QUALITY_NAMES);
+        let totalCards = 0;
+        let burnedCards = 0;
+
         for (card of userCards.rows) {
+            if (card.burned) {
+                burnedCards++;
+                continue;
+            }
+            totalCards++;
             qualityCount[card.quality-1]++;
         }
 
@@ -33,7 +41,7 @@ module.exports = {
         let embed = new EmbedBuilder()
             .setTitle(`${discordUser.username}'s Stats`)
             .addFields(
-                { name: "Cards owned", value: `${qualities.join('\n')}\n${userCards.count} total`, inline: true },
+                { name: "Cards owned", value: `${qualities.join('\n')}\n${totalCards} total - ${burnedCards} burned`, inline: true },
                 { name: "Level", value: `${level.currentLevel}`, inline: true },
                 { name: "Progress", value: `${level.currentExperience} / ${level.nextLevelExperience}\n${level.remaining} XP remaining`, inline: true },
                 { name: "Registered since", value: `${registrationDate}`, inline: true }

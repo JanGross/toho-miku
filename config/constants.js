@@ -26,7 +26,35 @@ const CURRENCY_NAMES = {
     2 : "Gems"
 }
 
+const QUALITY_VALUES = {
+    1 : {
+        type: 1,
+        value: 2
+    },
+    2 : {
+        type: 1,
+        value: 5
+    },
+    3 : {
+        type: 1,
+        value: 10
+    },
+    4 : {
+        type: 1,
+        value: 15
+    },
+    5 : {
+        type: 1,
+        value: 20
+    },
+    6 : {
+        type: 2,
+        value: 2
+    }
+}
+
 exports.QUALITY = QUALITY;
 exports.QUALITY_NAMES = QUALITY_NAMES;
 exports.CURRENCY_SYMBOLS = CURRENCY_SYMBOLS;
 exports.CURRENCY_NAMES = CURRENCY_NAMES;
+exports.QUALITY_VALUES = QUALITY_VALUES;
