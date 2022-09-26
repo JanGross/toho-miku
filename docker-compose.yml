@@ -3,7 +3,7 @@ version: "3.7"
 services:
   bot:
     build: .
-    command: sh -c "npm config set cache /app/.npm_cache --global && npm install && node ."
+    command: sh -c "npm config set cache /app/.npm_cache --global && npm install && npx sequelize db:migrate && node ."
     restart: unless-stopped
     environment:
       - TZ=Europe/Berlin
