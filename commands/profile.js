@@ -3,6 +3,7 @@ const { Card, User, Character } = require("../models");
 const { UserUtils, Compositing, Rendering } = require("../util");
 const axios = require("axios");
 const sharp = require("sharp");
+const { CURRENCY_NAMES } = require("../config/constants");
 const fs = require('fs');
 
 const pageSize = 8;
@@ -34,6 +35,8 @@ module.exports = {
         profileTemplate = profileTemplate.replace(/{{HEADER_COLOR}}/g, '190,31,97');
         profileTemplate = profileTemplate.replace(/{{CC}}/g, await Card.count({where: {userId: user.id}}));
         profileTemplate = profileTemplate.replace(/{{LVL}}/g, await user.level().currentLevel);
+        profileTemplate = profileTemplate.replace(/{{CUR_1}}/g, `${await user.primaryCurrency} ${CURRENCY_NAMES[1]}`);
+        profileTemplate = profileTemplate.replace(/{{CUR_2}}/g, `${await user.secondaryCurrency} ${CURRENCY_NAMES[2]}`);
 
         let userImageBuffer = await axios.get(discordUser.displayAvatarURL({format: 'png', size: 128}), { responseType: 'arraybuffer' });
         userImage = await sharp(userImageBuffer.data);

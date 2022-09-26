@@ -31,6 +31,31 @@ module.exports = (sequelize, DataTypes) => {
           experience: this.experience + parseInt(amount)
       });
     }
+    async addCurrency(amount, type, source='unknown') {
+      let typeStr = '';
+      if (type == 1) {
+        typeStr = `primaryCurrency`;
+      }
+      if (type == 2) {
+        typeStr = `secondaryCurrency`;
+      }
+      console.log(`Adding ${amount} ${typeStr} to user ${this.id}`);
+      await sequelize.models.CurrencyHistory.create({
+        userId: this.id,
+        currency: type,
+        delta: amount,
+        previous: this[typeStr],
+        source: source
+      });
+      this[typeStr] += parseInt(amount);
+      await this.save();
+    }
+    async addPrimaryCurrency(amount, source='unknown') {
+      return await this.addCurrency(amount, 1, source);
+    }
+    async addSecondaryCurrency(amount, source='unknown') {
+      return await this.addCurrency(amount, 2, source);
+    }
     level() {
       let currentLevel = Math.floor(levelModifier * Math.sqrt(this.experience));
       let nextLevelExperience = Math.pow((currentLevel + 1) / levelModifier, 2);
@@ -74,6 +99,8 @@ module.exports = (sequelize, DataTypes) => {
     active: DataTypes.INTEGER,
     privacy: DataTypes.INTEGER,
     experience: DataTypes.INTEGER,
+    primaryCurrency: DataTypes.INTEGER,
+    secondaryCurrency: DataTypes.INTEGER,
     nextDrop: DataTypes.DATE,
     nextPull: DataTypes.DATE,
     nextDaily: DataTypes.DATE

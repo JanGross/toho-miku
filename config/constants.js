@@ -16,5 +16,17 @@ const QUALITY_NAMES = {
     6 : "Shiny"
 }
 
+const CURRENCY_SYMBOLS = {
+    1 : "🎶",
+    2 : "💎"
+}
+
+const CURRENCY_NAMES = {
+    1 : "Notes",
+    2 : "Gems"
+}
+
 exports.QUALITY = QUALITY;
 exports.QUALITY_NAMES = QUALITY_NAMES;
+exports.CURRENCY_SYMBOLS = CURRENCY_SYMBOLS;
+exports.CURRENCY_NAMES = CURRENCY_NAMES;

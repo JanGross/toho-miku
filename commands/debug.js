@@ -21,6 +21,8 @@ module.exports = {
                         { name: 'bot', value: 'bot' },
                         { name: 'reset_cd', value: 'reset_cd' },
                         { name: 'add_xp', value: 'add_xp' },
+                        { name: 'add_primary', value: 'add_primary' },
+                        { name: 'add_secondary', value: 'add_secondary' },
                         { name: 'toggle_maintenance', value: 'toggle_maintenance' },
                     )
                 )
@@ -120,6 +122,20 @@ module.exports = {
                 ephemeral: false
             });
             break;
+        case "add_primary":
+            await extUser.addPrimaryCurrency(interaction.options.getString("value"), `Debug command ran by ${interaction.member.displayName}`);
+            interaction.editReply({
+                content: `Added ${interaction.options.getString("value")} Primary to <@${extUser.discordId}>`,
+                ephemeral: false
+            });
+            break;
+        case "add_secondary":
+                await extUser.addSecondaryCurrency(interaction.options.getString("value"), `Debug command ran by ${interaction.member.displayName}`);
+                interaction.editReply({
+                    content: `Added ${interaction.options.getString("value")} Secondary to <@${extUser.discordId}>`,
+                    ephemeral: false
+                });
+                break;
         case "toggle_maintenance":
             let maintenance = await GeneralUtils.getBotProperty("maintenance");
             await GeneralUtils.setBotProperty("maintenance", !maintenance);
