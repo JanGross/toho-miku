@@ -9,7 +9,7 @@ module.exports = {
     data: new SlashCommandBuilder()
     .setName("drop")
     .setDescription("Drop a card"),
-    
+    permissionLevel: 0,
     async execute(interaction) {
         await interaction.deferReply();
         const user = await UserUtils.getUserByDiscordId(interaction.member.id);

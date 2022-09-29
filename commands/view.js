@@ -28,6 +28,7 @@ module.exports = {
                     .setRequired(true)
                     .setAutocomplete(true)
                 ),
+    permissionLevel: 0,
     async execute(interaction) {
         await interaction.deferReply();
 

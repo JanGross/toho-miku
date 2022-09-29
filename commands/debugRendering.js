@@ -4,7 +4,7 @@ module.exports = {
     data: new SlashCommandBuilder()
             .setName("debugrendering")
             .setDescription("Debug rendering"),
-    permissionLevel: 1,
+    permissionLevel: 2,
     async execute(interaction) {
         
         const image = await sharp({

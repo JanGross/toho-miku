@@ -19,6 +19,7 @@ module.exports = {
                     .setDescription("View someone else's profile")
                     .setRequired(false)
                 ),
+    permissionLevel: 0,
     async execute(interaction) {
         await interaction.reply({ files:[ 'https://cdn.discordapp.com/attachments/856904078754971658/1019009533470842930/rendering-placeholder.gif']});
 

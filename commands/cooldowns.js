@@ -7,6 +7,7 @@ module.exports = {
     data: new SlashCommandBuilder()
             .setName("cooldowns")
             .setDescription("List cooldowns"),
+    permissionLevel: 0,
     async execute(interaction) {
         //fetch the user given the userID and include his cards
         const user = await UserUtils.getUserByDiscordId(interaction.member.id);

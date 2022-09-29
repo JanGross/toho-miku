@@ -9,6 +9,7 @@ module.exports = {
     data: new SlashCommandBuilder()
             .setName("collection")
             .setDescription("List all cards in your collection"),
+    permissionLevel: 0,
     async execute(interaction) {
         let user = await UserUtils.getUserByDiscordId(interaction.member.id);
         let offset = 0;

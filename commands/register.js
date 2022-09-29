@@ -6,6 +6,7 @@ module.exports = {
     data: new SlashCommandBuilder()
             .setName("register")
             .setDescription("Register yourself"),
+    permissionLevel: 0,
     async execute(interaction) {
         let user = await User.findOne({
             where: {

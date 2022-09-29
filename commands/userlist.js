@@ -6,6 +6,7 @@ module.exports = {
     data: new SlashCommandBuilder()
             .setName("userlist")
             .setDescription("List all users"),
+    permissionLevel: 2,
     async execute(interaction) {
         let users = await User.findAll();
         let userList = "";

@@ -11,6 +11,7 @@ module.exports = {
                     .setDescription("View someone else's stats")
                     .setRequired(false)
                 ),
+    permissionLevel: 0,
     async execute(interaction) {
         await interaction.deferReply();
         let discordUser = interaction.options.getUser("user") ? interaction.options.getUser("user") : interaction.member.user;

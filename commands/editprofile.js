@@ -9,6 +9,7 @@ module.exports = {
     data: new SlashCommandBuilder()
             .setName("editprofile")
             .setDescription("Edit your profile"),
+    permissionLevel: 0,
     async execute(interaction) {
         let user = await UserUtils.getUserByDiscordId(interaction.member.id);
 
