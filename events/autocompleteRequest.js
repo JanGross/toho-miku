@@ -3,7 +3,7 @@ const { UserUtils } = require('../util');
 const { Card, Character, User } = require('../models');
 const Sequelize = require('sequelize');
 const { QUALITY_NAMES } = require('../config/constants');
-
+const { TestStore } = require('../stores');
 module.exports = {
     name: "interactionCreate",
     async execute (interaction) {
@@ -20,6 +20,12 @@ module.exports = {
             choices = await this.fetchCards(focusedOption, { user: user, ownedOnly: true });
         }
 
+        if (interaction.commandName === "trade") {
+            if (focusedOption.name === "card") {
+                choices = await this.fetchCards(focusedOption, { user: user, ownedOnly: true });
+            }
+        }
+        
         if (interaction.commandName === 'view') {
             const viewType = interaction.options.getString('type');
 

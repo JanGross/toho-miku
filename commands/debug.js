@@ -2,6 +2,7 @@ const { SlashCommandBuilder, ComponentType, ActionRowBuilder, ButtonBuilder, But
 const { customAlphabet } = require("nanoid");
 const { Card, User } = require("../models");
 const { UserUtils, CardUtils, GeneralUtils } = require("../util");
+const stores = require("../stores");
 require('dotenv').config();
 
 module.exports = {
@@ -24,6 +25,7 @@ module.exports = {
                         { name: 'add_primary', value: 'add_primary' },
                         { name: 'add_secondary', value: 'add_secondary' },
                         { name: 'toggle_maintenance', value: 'toggle_maintenance' },
+                        { name: 'store', value: 'store' },
                     )
                 )
             .addStringOption((option) =>
@@ -141,6 +143,12 @@ module.exports = {
             await GeneralUtils.setBotProperty("maintenance", !maintenance);
             interaction.editReply({
                 content: `Maintenance mode is now ${!maintenance}`,
+                ephemeral: false
+            });
+            break;
+        case "store":
+            interaction.editReply({
+                content: `${JSON.stringify(stores)}`,
                 ephemeral: false
             });
             break;
