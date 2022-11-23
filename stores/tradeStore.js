@@ -17,6 +17,14 @@ module.exports = {
     async getTradeByUser(userId) {
         return this.activeTrades.find(trade => trade.user1.id === userId || trade.user2.id === userId);
     },
+    
+    States: {
+        OPEN: 0,
+        LOCKED: 1,
+        ACCEPTED: 2,
+        CANCELLED: 3,
+        EXPIRED: 4
+    },
 
     Trade: class Trade {
         constructor(id, user1, user2) {
@@ -26,8 +34,11 @@ module.exports = {
             this.embed = null;
             this.user1Cards = [];
             this.user2Cards = [];
-            this.user1Accept = false;
-            this.user2Accept = false;
+            this.user1Locked = false;
+            this.user2Locked = false;
+            this.user1Accepted = false;
+            this.user2Accepted = false;
+            this.state = 0;
         }
     }
 }
