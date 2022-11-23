@@ -1,5 +1,6 @@
 const { customAlphabet } = require("nanoid");
 const { Card, Character } = require("../models");
+const { QUALITY_SYMBOLS } = require("../config/constants");
 
 module.exports = {
     name: "CardUtils",
@@ -19,5 +20,9 @@ module.exports = {
 
     getCharacterCount: async function(characterId) {
         return await Character.count();
+    },
+
+    getShortString: function(card) {
+        return `[\`${card.identifier}\`] ${QUALITY_SYMBOLS[card.quality]} ${card.Character.name} (${card.printNr})`;
     }
 }
