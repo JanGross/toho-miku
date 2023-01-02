@@ -1,10 +1,11 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { Card, User, Character } = require("../models");
-const { UserUtils, CardUtils } = require("../util");
+const { UserUtils, CardUtils, DbUtils, GeneralUtils } = require("../util");
 const { TradeStore } = require("../stores");
 
 const tradeExpiry = 920000; //When an active trade expires automatically
 const tradeTimeout = 120000; //Time until user can start a new trade
+const db = DbUtils.getDb();
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -316,8 +317,9 @@ module.exports = {
                 }
 
                 if (trade.user1accepted && trade.user2accepted) {
-                    trade.state = TradeStore.States.ACCEPTED;
                     collector.stop("accepted");
+                    trade.state = TradeStore.States.ACCEPTED;
+                    await this.transactCards(trade, interaction);
                 }
 
                 await button.deferUpdate();
@@ -334,13 +336,52 @@ module.exports = {
                 trade.state = TradeStore.States.CANCELLED;
             }
             if (reason === "accepted") {
-                //TODO: perform trade on database
+                trade.state = TradeStore.States.ACCEPTED;
             }
             await this.viewTrade(interaction, trade);
             await this.endTrade(trade);
         });
     },
 
+    async transactCards(trade, interaction) {
+        try {
+            const result = await db.sequelize.transaction(async (trx) => {
+                //check and update user1 cards
+                for (let i = 0; i < trade.user1Cards.length; i++) {
+                    const card = trade.user1Cards[i];
+                    let result = await Card.update(
+                        { userId: trade.user2.id },
+                        { where: { id: card.id, userId: trade.user1.id } },
+                        { transaction: trx }
+                    )
+                    if (result[0] == 0) {
+                        await interaction.channel.send(`Card ${card.id} is not owned by ${trade.user1.discordId}! That's not supposed to happen, transaction rolled back!`);
+                        trx.rollback();
+                        throw new Error(`Card ${card.id} is not owned by ${trade.user1.discordId}!`);
+                    }
+                }
+                //check and update user1 cards
+                for (let i = 0; i < trade.user2Cards.length; i++) {
+                    const card = trade.user2Cards[i];
+                    let result = await Card.update(
+                        { userId: trade.user1.id },
+                        { where: { id: card.id, userId: trade.user2.id } },
+                        { transaction: trx }
+                    )
+                    if (!result) {
+                        await interaction.channel.send(`Card ${card.id} is not owned by ${trade.user2.discordId}! That's not supposed to happen, transaction rolled back!`);
+                        trx.rollback();
+                        throw new Error(`Card ${card.id} is not owned by ${trade.user2.discordId}!`);
+                    }
+                }
+
+            });
+        } catch (error) {
+            let logID = await GeneralUtils.generateLogID();
+            console.log(`[${logID}] ${error} : ${error.stack}`);
+            await interaction.channel.send(`Transaction failed! Please contact an admin with log ID ${logID}!`);
+        }
+    },
     async endTrade(trade) {
         setTimeout(async () => {
             await TradeStore.removeTrade(trade);
