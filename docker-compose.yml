@@ -15,6 +15,7 @@ services:
       - /usr/share/fonts/:/usr/share/fonts/
   mysql:
       image: mysql:8.0
+      restart: unless-stopped
       ports:
         - ${DB_PORT}:3306
       volumes:
