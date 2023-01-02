@@ -3,7 +3,9 @@ const { Card, User, Character } = require("../models");
 const { UserUtils, CardUtils } = require("../util");
 const { TradeStore } = require("../stores");
 
-const tradeTimeout = 90000;
+const tradeExpiry = 920000; //When an active trade expires automatically
+const tradeTimeout = 120000; //Time until user can start a new trade
+
 module.exports = {
     data: new SlashCommandBuilder()
             .setName("trade")
@@ -44,6 +46,10 @@ module.exports = {
         switch (interaction.options.getSubcommand()) {
             case "start":
                 let user2 = await UserUtils.getUserByDiscordId(interaction.options.getUser("user").id);
+                if (!user2) {
+                    await interaction.editReply({ content: "You can't trade with an unregistered user!" });
+                    return;
+                }
                 //Attach usernames for convenience
                 user2.name = interaction.options.getUser("user").username;
                 user1.name = interaction.member.user.username;
@@ -72,6 +78,7 @@ module.exports = {
     },
     
     async startTrade(interaction, user1, user2) {
+        //user1 is the user who started the trade, user2 is the user who is being traded with
         if (!user2) {
             await interaction.editReply({ content: "This User is not registered yet!" });
             return;
@@ -80,12 +87,22 @@ module.exports = {
             await interaction.editReply({ content: "You can't trade with yourself!" });
             return;
         }
-        if (await TradeStore.getTradeByUser(user1.id)) {
-            await interaction.editReply({ content: "You are already in a Trade!" });
-            return;
+
+        let user1Trade = await TradeStore.getTradeByUser(user1.id);
+        if (user1Trade) {
+            if (user1Trade.state <= 1) {
+                await interaction.editReply({ content: "You are already in a Trade!" });
+                return;
+            }
+            //If the initiating user still has a finished or cancelled trade in store, he's on a timeout
+            if (user1Trade.state >= 2 && user1Trade.user1.id === user1.id) {
+                await interaction.editReply({ content: `You need to wait ${tradeTimeout / 1000 / 60 } minutes before staring a new trade` });
+                return;
+            }
         }
-        if (await TradeStore.getTradeByUser(user2.id)) {
-            await interaction.editReply({ content: "This User is already in a Trade!" });
+        let user2Trade = await TradeStore.getTradeByUser(user2.id);
+        if (user2Trade) {
+            await interaction.editReply({ content: `This User is ${(user2Trade.state <= 1 ) ? "already in a trade" : "on cooldown!" }` });
             return;
         }
         let trade = new TradeStore.Trade(CardUtils.generateIdentifier(), user1, user2);
@@ -176,9 +193,6 @@ module.exports = {
         }
         
         trade.embed = reply;
-        if (trade.cancelled || trade.expired) {
-            await TradeStore.removeTrade(trade);
-        }
     },
 
     addComponentsToRow(row, trade) {
@@ -232,13 +246,36 @@ module.exports = {
                 .setDisabled(true)
             );
         }
+
+        //if trade is cancelled, add a button to finalize it
+        if (trade.state === TradeStore.States.CANCELLED) {
+            row.addComponents(
+                new ButtonBuilder()
+                .setCustomId(`trade-cancelled-${trade.id}`)
+                .setLabel('Cancelled')
+                .setStyle(ButtonStyle.Danger)
+                .setDisabled(true)
+            );
+        }
+
+        //if trade is expired, add a button to finalize it
+        if (trade.state === TradeStore.States.EXPIRED) {
+            row.addComponents(
+                new ButtonBuilder()
+                .setCustomId(`trade-expired-${trade.id}`)
+                .setLabel(`Expired after ${tradeExpiry / 1000 / 60} minutes`)
+                .setStyle(ButtonStyle.Danger)
+                .setDisabled(true)
+            );
+        }
+
         return row;
     },
 
     async attachCollectors(trade, reply, interaction) {
         //button collector
         const filter = (button) => button.user.id === trade.user1.discordId || button.user.id === trade.user2.discordId;
-        const collector = reply.createMessageComponentCollector({ filter, time: tradeTimeout });
+        const collector = reply.createMessageComponentCollector({ filter, time: tradeExpiry });
 
         collector.on('collect', async (button) => {
             //if interaction member is neither user1 nor user2, ignore
@@ -247,6 +284,7 @@ module.exports = {
             }
 
             if (button.customId === `cancel-trade-${trade.id}`) {
+                button.deferUpdate();
                 collector.stop("cancel");
             }
             if (button.customId === `lock-trade-${trade.id}`) {
@@ -299,6 +337,13 @@ module.exports = {
                 //TODO: perform trade on database
             }
             await this.viewTrade(interaction, trade);
+            await this.endTrade(trade);
         });
+    },
+
+    async endTrade(trade) {
+        setTimeout(async () => {
+            await TradeStore.removeTrade(trade);
+        }, tradeTimeout);
     }
 }
