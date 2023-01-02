@@ -8,13 +8,14 @@ module.exports = {
             .setDescription("Register yourself"),
     permissionLevel: 0,
     async execute(interaction) {
+        await interaction.deferReply();
         let user = await User.findOne({
             where: {
                 discordId: interaction.user.id
             }
         });
         if (user) {
-            interaction.reply({
+            interaction.editReply({
                 content: "You are already registered",
                 ephemeral: true
             });
@@ -23,7 +24,7 @@ module.exports = {
                 discordId: interaction.user.id,
                 active: 1,
             });
-            interaction.reply({
+            interaction.editReply({
                 content: "You are now registered",
                 ephemeral: false
             });
