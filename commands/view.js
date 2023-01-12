@@ -156,7 +156,9 @@ module.exports = {
                         .setStyle(ButtonStyle.Danger)
                 );
         }
-        const message = await interaction.editReply({ embeds: [embed], files: [imagePath], components: [row], fetchReply: true });
+        let replyPayload = { embeds: [embed], files: [imagePath], fetchReply: true }
+        if  (isAdmin) { replyPayload.components = [row]; }
+        const message = await interaction.editReply(replyPayload);
         const filter = (m) => m.member.user.id === interaction.member.user.id;
         const collector = message.createMessageComponentCollector({ filter, componentType: ComponentType.Button, time: 120000 });
 
