@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const { Card, User, Character } = require("../models");
+const { Card, User, Character, TradeHistory } = require("../models");
 const { UserUtils, CardUtils, DbUtils, GeneralUtils } = require("../util");
 const { TradeStore } = require("../stores");
 
@@ -346,6 +346,12 @@ module.exports = {
     async transactCards(trade, interaction) {
         try {
             const result = await db.sequelize.transaction(async (trx) => {
+                let historyData = {
+                    userAId: trade.user1.id,
+                    userBId: trade.user2.id,
+                    userATraded: [],
+                    userBTraded: []
+                }
                 //check and update user1 cards
                 for (let i = 0; i < trade.user1Cards.length; i++) {
                     const card = trade.user1Cards[i];
@@ -359,6 +365,7 @@ module.exports = {
                         trx.rollback();
                         throw new Error(`Card ${card.id} is not owned by ${trade.user1.discordId}!`);
                     }
+                    historyData.userATraded.push(card.id);
                 }
                 //check and update user1 cards
                 for (let i = 0; i < trade.user2Cards.length; i++) {
@@ -373,8 +380,9 @@ module.exports = {
                         trx.rollback();
                         throw new Error(`Card ${card.id} is not owned by ${trade.user2.discordId}!`);
                     }
+                    historyData.userBTraded.push(card.id);
                 }
-
+                let history = await TradeHistory.create(historyData);
             });
         } catch (error) {
             let logID = await GeneralUtils.generateLogID();
