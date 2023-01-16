@@ -79,13 +79,13 @@ module.exports = {
             let option = m.customId.split("-")[0];
             switch (option) {
                 case 'name':
-                    let newName = await this.openStringModal(m, `Edit ${option} for ${record.name}`, "");
+                    let newName = await this.openStringModal(m, `Edit ${option} for ${record.name}`, "", "name-"+interaction.id);
                     if (newName) {
                         await this.updateRecord(user, record, option, newName.value);
                     }
                     break;
                 case 'description':
-                    let newDesc = await this.openParagraphModal(m, `Edit ${option} for ${record.name}`, "");
+                    let newDesc = await this.openParagraphModal(m, `Edit ${option} for ${record.name}`, "", "desc-"+interaction.id);
                     if (newDesc) {
                         await this.updateRecord(user, record, option, newDesc.value);
                     }
@@ -119,14 +119,15 @@ module.exports = {
         fs.writeFileSync(path, imageBuffer.data);
     },
 
-    async openParagraphModal(interaction, title, placeholder) {
+    async openParagraphModal(interaction, title, placeholder, persistentId) {
+        const customId = 'paragraphModal-' + persistentId;
         const modal = new ModalBuilder()
-            .setCustomId('paragraphModal')
+            .setCustomId(customId)
             .setTitle(title.substr(0, 44));
 
         let row = new ActionRowBuilder();
         let textInput = new TextInputBuilder()
-            .setCustomId(`input-${interaction.id}`)
+            .setCustomId(`input-${persistentId}`)
             .setLabel("Enter new value")
             .setStyle(TextInputStyle.Paragraph)
             .setRequired(false)
@@ -145,19 +146,21 @@ module.exports = {
             return null
           })
           
-          if (submitted) {
-            submitted.reply({ content: `You submitted: ${submitted.fields.getTextInputValue(`input-${interaction.id}`)}`})
-            return { i: submitted, value: submitted.fields.getTextInputValue(`input-${interaction.id}`)};
+          if (submitted && submitted.customId == customId) {
+            await submitted.deferReply();
+            await submitted.editReply({ content: `You submitted: ${submitted.fields.getTextInputValue(`input-${persistentId}`)}`})
+            return { i: submitted, value: submitted.fields.getTextInputValue(`input-${persistentId}`)};
           }
     },
-    async openStringModal(interaction, title, placeholder) {
+    async openStringModal(interaction, title, placeholder, persistentId) {
+        const customId = 'textModal-' + persistentId;
         const modal = new ModalBuilder()
-            .setCustomId('textModal')
+            .setCustomId(customId)
             .setTitle(title.substr(0, 44));
 
         let row = new ActionRowBuilder();
         let textInput = new TextInputBuilder()
-            .setCustomId(`input-${interaction.id}`)
+            .setCustomId(`input-${persistentId}`)
             .setLabel("Enter new value")
             .setStyle(TextInputStyle.Short)
             .setRequired(false)
@@ -175,10 +178,11 @@ module.exports = {
             console.error(error)
             return null
           })
-          
-          if (submitted) {
-            submitted.reply({ content: `You submitted: ${submitted.fields.getTextInputValue(`input-${interaction.id}`)}` });
-            return { i: submitted, value: submitted.fields.getTextInputValue(`input-${interaction.id}`)};
+
+          if (submitted && submitted.customId == customId) {
+            await submitted.deferReply();
+            await submitted.editReply({ content: `You submitted: ${submitted.fields.getTextInputValue(`input-${persistentId}`)}` });
+            return { i: submitted, value: submitted.fields.getTextInputValue(`input-${persistentId}`)};
           }
     },
     async updateRecord(user, record, property, value) {
