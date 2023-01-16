@@ -22,7 +22,7 @@ module.exports = {
             .setColor(0x00AE86);
 
         //add collector for pagination
-        const filter = (i) => i.customId.includes(uid);
+        const filter = (i) => i.customId.includes(uid) && i.user.id === user.discordId;
         const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
         
         let row = this.getPaginateComponents(uid, prev=false, groupDupes=groupDupes);
