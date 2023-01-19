@@ -1,5 +1,6 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { Card, User, Character } = require("../models");
+const { QUALITY, QUALITY_NAMES } = require('../config/constants');
 const UserUtils = require("../util/users");
 
 const pageSize = 8;
@@ -8,7 +9,36 @@ const pageSize = 8;
 module.exports = {
     data: new SlashCommandBuilder()
             .setName("collection")
-            .setDescription("List all cards in your collection"),
+            .setDescription("List all cards in your collection")
+            .addStringOption((option) =>
+                option
+                .setName("character")
+                .setDescription("Character to filter by")
+                .setRequired(false)
+                .setAutocomplete(true)
+            )
+            .addStringOption((option) =>
+                option
+                .setName("band")
+                .setDescription("Band to filter by")
+                .setRequired(false)
+                .setAutocomplete(true)
+            )
+            .addStringOption((option) =>
+                option
+                .setName("quality")
+                .setDescription("Quality to filter by")
+                .setRequired(false)
+                .addChoices(
+                    { name: QUALITY_NAMES[1], value: "1"},
+                    { name: QUALITY_NAMES[2], value: "2"},
+                    { name: QUALITY_NAMES[3], value: "3"},
+                    { name: QUALITY_NAMES[4], value: "4"},
+                    { name: QUALITY_NAMES[5], value: "5"},
+                    { name: QUALITY_NAMES[6], value: "6"},
+                )                
+            )
+            ,
     permissionLevel: 0,
     async execute(interaction) {
         let user = await UserUtils.getUserByDiscordId(interaction.member.id);
@@ -22,9 +52,15 @@ module.exports = {
             .setColor(0x00AE86);
 
         //add collector for pagination
-        const filter = (i) => i.customId.includes(uid) && i.user.id === user.discordId;
-        const collector = interaction.channel.createMessageComponentCollector({ filter, time: 60000 });
+        const collectorFilter = (i) => i.customId.includes(uid) && i.user.id === user.discordId;
+        const collector = interaction.channel.createMessageComponentCollector({ collectorFilter, time: 60000 });
         
+        const filter = {
+            character: interaction.options.getString("character"),
+            band: interaction.options.getString("band"),
+            quality: interaction.options.getString("quality")
+        }
+
         let row = this.getPaginateComponents(uid, prev=false, groupDupes=groupDupes);
         
         let embedMessage = await interaction.reply({
@@ -34,7 +70,7 @@ module.exports = {
             fetchReply: true
         });
 
-        this.updatePageEmbed(uid, embedMessage, user, offset, groupDupes);  
+        this.updatePageEmbed(uid, embedMessage, user, offset, groupDupes, filter);  
 
         collector.on('collect', async (i) => {
             i.deferUpdate();
@@ -49,7 +85,7 @@ module.exports = {
             if (i.customId === `group-${uid}`) {
                 groupDupes = !groupDupes;
             }
-            this.updatePageEmbed(uid, embedMessage, user, offset, groupDupes);
+            this.updatePageEmbed(uid, embedMessage, user, offset, groupDupes, filter);
         });
 
         collector.on('end', collected => {
@@ -85,37 +121,39 @@ module.exports = {
         return row;
     },
 
-    async updatePageEmbed(uid, i, user, offset, group) {
-        let cards
-        if (group)  {
-            cards = await Card.findAndCountAll({
-                where: {
-                    userId: user.id,
-                    burned: false
-                },
-                group: ["characterId"],
-                attributes: ["characterId", [Card.sequelize.fn("COUNT", "characterId"), "count"]],
-                order: [[Card.sequelize.literal("count"), "DESC"]],
-                include: [{
-                    model: Character,
-                }],
-                limit: pageSize,
-                offset: offset
-            });
-            cards.count = cards.count.length;
-        } else {
-            cards = await Card.findAndCountAll({
-                where: {
-                    userId: user.id,
-                    burned: false
-                },
-                limit: pageSize,
-                offset: offset,
-                include: [{
-                    model: Character,
-                }]
-            });
+    async updatePageEmbed(uid, i, user, offset, group, filterParam) {
+        let cards;
+        let filter = {
+            where: {
+                userId: user.id,
+                burned: false
+            },
+            include: [{
+                model: Character,
+            }],
+            limit: pageSize,
+            offset: offset
         }
+        
+        if (group)  {
+            filter["attributes"] = ["characterId", [Card.sequelize.fn("COUNT", "characterId"), "count"]];
+            filter["order"] = [[Card.sequelize.literal("count"), "DESC"]];
+            filter["group"] = ["characterId"];
+        }
+
+        if (filterParam["character"]) {
+            filter["where"]["characterId"] = filterParam["character"];
+        }
+
+        if (filterParam["band"]) {
+            filter["where"]['$Character.bandId$'] = filterParam["band"];
+        }
+
+        if (filterParam["quality"]) {
+            filter["where"]["quality"] = filterParam["quality"];
+        }
+
+        cards = await Card.findAndCountAll(filter);
         cards.rows = cards.rows ? cards.rows : cards;
         let pageStart = offset + 1;
         let pageEnd = offset + cards.rows.length;

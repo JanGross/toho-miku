@@ -1,6 +1,6 @@
 const { InteractionType } = require('discord.js');
 const { UserUtils } = require('../util');
-const { Card, Character, User } = require('../models');
+const { Card, Character, User, Band } = require('../models');
 const Sequelize = require('sequelize');
 const { QUALITY_NAMES } = require('../config/constants');
 const { TestStore } = require('../stores');
@@ -50,6 +50,48 @@ module.exports = {
                     }
                     break;
                 case 'band':
+                    break;
+            }
+        }
+        if (interaction.commandName === 'collection') {
+            const character = interaction.options.getString('character');
+            const band = interaction.options.getString('band');
+            const quality = interaction.options.getString('quality');
+            //TODO: avoid duplicate code hehe
+            switch (focusedOption.name) {
+                case 'character':
+                    if(focusedOption.value.length < 3) break;
+                    const characters = await Character.findAll({
+                        where: {
+                            name: {
+                                [Sequelize.Op.like]: `%${focusedOption.value}%`
+                            }
+                        },
+                        limit: 10
+                    });
+                    for (let i = 0; i < characters.length; i++) {
+                        choices.push({
+                            name: characters[i].name,
+                            value: `${characters[i].id}`
+                        });
+                    }
+                    break;
+                case 'band':
+                    if(focusedOption.value.length < 3) break;
+                    const bands = await Band.findAll({
+                        where: {
+                            name: {
+                                [Sequelize.Op.like]: `%${focusedOption.value}%`
+                            }
+                        },
+                        limit: 10
+                    });
+                    for (let i = 0; i < bands.length; i++) {
+                        choices.push({
+                            name: bands[i].name,
+                            value: `${bands[i].id}`
+                        });
+                    }
                     break;
             }
         }
