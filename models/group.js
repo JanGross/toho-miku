@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class Band extends Model {
+  class Group extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,17 +11,17 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Band.hasMany(models.Character);
+      Group.hasMany(models.Character);
     }
   }
-  Band.init({
+  Group.init({
     name: DataTypes.STRING,
     description: DataTypes.TEXT,
     imageURL: DataTypes.STRING,
     enabled: DataTypes.BOOLEAN
   }, {
     sequelize,
-    modelName: 'Band',
+    modelName: 'Group',
   });
-  return Band;
+  return Group;
 };

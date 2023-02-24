@@ -10,12 +10,12 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      Character.belongsTo(models.Band, { foreignKey: 'bandId', });
+      Character.belongsTo(models.Group, { foreignKey: 'groupId', });
     }
   }
   Character.init({
     name: DataTypes.STRING,
-    bandId: DataTypes.INTEGER,
+    groupId: DataTypes.INTEGER,
     imageIdentifier: DataTypes.STRING,
     description: DataTypes.TEXT,
     enabled: DataTypes.BOOLEAN
