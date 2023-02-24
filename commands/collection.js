@@ -19,8 +19,8 @@ module.exports = {
             )
             .addStringOption((option) =>
                 option
-                .setName("band")
-                .setDescription("Band to filter by")
+                .setName("group")
+                .setDescription("Group to filter by")
                 .setRequired(false)
                 .setAutocomplete(true)
             )
@@ -57,7 +57,7 @@ module.exports = {
         
         const filter = {
             character: interaction.options.getString("character"),
-            band: interaction.options.getString("band"),
+            group: interaction.options.getString("group"),
             quality: interaction.options.getString("quality")
         }
 
@@ -145,8 +145,8 @@ module.exports = {
             filter["where"]["characterId"] = filterParam["character"];
         }
 
-        if (filterParam["band"]) {
-            filter["where"]['$Character.bandId$'] = filterParam["band"];
+        if (filterParam["group"]) {
+            filter["where"]['$Character.groupId$'] = filterParam["group"];
         }
 
         if (filterParam["quality"]) {

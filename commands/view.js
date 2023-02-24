@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, AttachmentBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
-const { Card, User, Band, Character } = require("../models");
+const { Card, User, Group, Character } = require("../models");
 const { Rendering, UserUtils } = require("../util");
 const { QUALITY_NAMES } = require("../config/constants");
 const fs = require("fs");
@@ -18,7 +18,7 @@ module.exports = {
                     .addChoices(
                         { name: 'card', value: 'card' },
                         { name: 'character', value: 'character' },
-                        { name: 'band', value: 'band' }
+                        { name: 'group', value: 'group' }
                     )
                 )
             .addStringOption((option) =>
@@ -39,8 +39,8 @@ module.exports = {
             case "character":
                 this.viewCharacter(interaction, interaction.options.getString("id"));
                 break;
-            case "band":
-                interaction.editReply({ content: "Band view is not yet implemented" });
+            case "group":
+                interaction.editReply({ content: "Group view is not yet implemented" });
                 break;
 
         }
@@ -52,7 +52,7 @@ module.exports = {
                 identifier: cardIdentifier
             },
             include: [
-                { model: Character, include: [{ model: Band }] },
+                { model: Character, include: [{ model: Group }] },
                 { model: User}
             ]
         });
@@ -83,10 +83,10 @@ module.exports = {
             .setTitle(`${card.Character.name}`)
             .setDescription(description)
             .setImage(`attachment://${filename}`)
-            .setThumbnail(card.Character.Band.imageURL)
+            .setThumbnail(card.Character.Group.imageURL)
             .addFields(
                 { name: "Owned by", value: `<@${card.User.discordId}>` },
-                { name: "Band", value: `${card.Character.Band.name}` },
+                { name: "Group", value: `${card.Character.Group.name}` },
                 { name: "Character ID", value: `${card.Character.id}` },
                 { name: 'Print Number', value: `${card.printNr}`, inline: true },
                 { name: 'Quality', value: `${QUALITY_NAMES[card.quality]} ${(card.quality === 6 ? '<a:sparklu:1019505245572837428>':'')}`, inline: true }
@@ -105,7 +105,7 @@ module.exports = {
         let isAdmin = await UserUtils.getPermissionLevel(interaction.member) == 2;
         let character = await Character.findOne({ 
             where: { id: characterId },
-            include: [Band]
+            include: [Group]
         });
         if (!character) {
             interaction.editReply({ content: "Character not found" });
@@ -139,9 +139,9 @@ module.exports = {
             .setTitle(`${character.name}`)
             .setDescription(description)
             .setImage(`attachment://${filename}`)
-            .setThumbnail(character.Band.imageURL)
+            .setThumbnail(character.Group.imageURL)
             .addFields(
-                { name: "Band", value: `${character.Band.name}` },
+                { name: "Group", value: `${character.Group.name}` },
                 { name: "Character ID", value: `${character.id}` },
             )
             .setColor(0x00ff00)

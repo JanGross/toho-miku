@@ -1,6 +1,6 @@
 const { InteractionType } = require('discord.js');
 const { UserUtils } = require('../util');
-const { Card, Character, User, Band } = require('../models');
+const { Card, Character, User, Group } = require('../models');
 const Sequelize = require('sequelize');
 const { QUALITY_NAMES } = require('../config/constants');
 const { TestStore } = require('../stores');
@@ -49,13 +49,13 @@ module.exports = {
                         });
                     }
                     break;
-                case 'band':
+                case 'group':
                     break;
             }
         }
         if (interaction.commandName === 'collection') {
             const character = interaction.options.getString('character');
-            const band = interaction.options.getString('band');
+            const group = interaction.options.getString('group');
             const quality = interaction.options.getString('quality');
             //TODO: avoid duplicate code hehe
             switch (focusedOption.name) {
@@ -76,9 +76,9 @@ module.exports = {
                         });
                     }
                     break;
-                case 'band':
+                case 'group':
                     if(focusedOption.value.length < 3) break;
-                    const bands = await Band.findAll({
+                    const groups = await Group.findAll({
                         where: {
                             name: {
                                 [Sequelize.Op.like]: `%${focusedOption.value}%`
@@ -86,10 +86,10 @@ module.exports = {
                         },
                         limit: 10
                     });
-                    for (let i = 0; i < bands.length; i++) {
+                    for (let i = 0; i < groups.length; i++) {
                         choices.push({
-                            name: bands[i].name,
-                            value: `${bands[i].id}`
+                            name: groups[i].name,
+                            value: `${groups[i].id}`
                         });
                     }
                     break;

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, ComponentType, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, TextInputStyle, TextInputBuilder } = require("discord.js");
-const { Character, Band, RecordHistory } = require("../models");
+const { Character, Group, RecordHistory } = require("../models");
 const { UserUtils, GeneralUtils } = require("../util");
 const axios = require("axios");
 const fs = require("fs");
@@ -15,7 +15,7 @@ module.exports = {
                     .setRequired(true)
                     .addChoices(
                         { name: 'character', value: 'character' },
-                        { name: 'band', value: 'band' }
+                        { name: 'group', value: 'group' }
                     )
                 )
             .addStringOption((option) =>
@@ -39,14 +39,14 @@ module.exports = {
         let record;
         switch (interaction.options?.getString("type") ?? type) {
         case "character":
-            record = await Character.findByPk(interaction.options?.getString("id") ?? id, { include: Band });
+            record = await Character.findByPk(interaction.options?.getString("id") ?? id, { include: Group });
             if (!record) {
                 interaction.editReply({ content: "Character not found" });
                 return;
             }
             options = [ "name", "description", "imageIdentifier" ];
             break;
-        case "band":
+        case "group":
             options = [ "name", "description" ];
             break;
         default:
@@ -102,7 +102,7 @@ module.exports = {
                         await m.reply({ content: "An invalid image has been attached", ephemeral: true });
                         return;
                     }
-                    let identifier = `${record.Band.name.replace(" ", "_")}/${image.name}`;
+                    let identifier = `${record.Group.name.replace(" ", "_")}/${image.name}`;
                     let path = `/app/assets/cards/${identifier}`;
                     await this.downloadImage(image.attachment, path);
                     await this.updateRecord(user, record, option, identifier);

@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, AttachmentBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
-const { Card, User, Band, Character } = require("../models");
+const { Card, User, Group, Character } = require("../models");
 const { QUALITY_VALUES, QUALITY_NAMES, CURRENCY_SYMBOLS } = require("../config/constants");
 const { UserUtils } = require("../util");
 const fs = require("fs");
@@ -26,7 +26,7 @@ module.exports = {
                 identifier: interaction.options.getString("id")
             },
             include: [
-                { model: Character, include: [{ model: Band }] },
+                { model: Character, include: [{ model: Group }] },
                 { model: User}
             ]
         });
@@ -47,7 +47,7 @@ module.exports = {
             .setTitle(`${interaction.member.displayName} burned ${card.identifier}`)
             .setDescription(`+${QUALITY_VALUES[card.quality].value} ${CURRENCY_SYMBOLS[QUALITY_VALUES[card.quality].type]}`)
             .addFields(
-                { name: `${card.Character.name}`, value: `${card.Character.Band.name}` },
+                { name: `${card.Character.name}`, value: `${card.Character.Group.name}` },
                 { name: 'Print Number', value: `${card.printNr}`, inline: true },
                 { name: 'Quality', value: `${QUALITY_NAMES[card.quality]}`, inline: true }
             )

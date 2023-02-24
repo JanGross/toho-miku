@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, AttachmentBuilder } = require("discord.js");
-const { Card, Character, Band } = require("../models");
+const { Card, Character, Group } = require("../models");
 
 //fetch all cards owned by the user and list them
 module.exports = {
@@ -11,7 +11,7 @@ module.exports = {
                     .setDescription('Entity type')
                     .setRequired(true)
                     .addChoices(
-                        { name: 'Band', value: 'band' },
+                        { name: 'Group', value: 'group' },
                         { name: 'Character', value: 'character' },
                         { name: 'DEBUG', value: 'debug' },
                     )
@@ -36,38 +36,38 @@ module.exports = {
         await interaction.deferReply();
         const type = interaction.options.getString('type');
         
-        if (type === 'band') {
-            let band = await Band.findOne({
+        if (type === 'group') {
+            let group = await Group.findOne({
                 where: {
                     id: interaction.options.getInteger('id')
                 }
             });
-            if (!band) {
+            if (!group) {
                 interaction.editReply({
-                    content: "Band not found",
+                    content: "Group not found",
                     ephemeral: true
                 });
                 return;
             }
-            await band.update({
+            await group.update({
                 enabled: interaction.options.getBoolean('enabled')
             });
             
             if (interaction.options.getBoolean('include_children')) {
                 let characters = await Character.findAll({
                     where: {
-                        bandId: band.id
+                        groupId: group.id
                     }
                 });
                 Character.update({ 
                     enabled: (interaction.options.getBoolean('enabled') ? 1 : 0)}, {
-                    where: { bandId: band.id }
+                    where: { groupId: group.id }
                 });
                 
             }
 
             await interaction.editReply({
-                content: `${band.name} is now ` 
+                content: `${group.name} is now ` 
                 + `${(interaction.options.getBoolean('enabled') ? 'active' : 'inactive')} `
                 + `(Including children: ${(interaction.options.getBoolean('include_children') ? 'yes' : 'no')})`
             });

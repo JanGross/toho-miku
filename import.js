@@ -2,7 +2,7 @@ require("dotenv").config();
 const { Console } = require("console");
 const fs = require("fs");
 const dbUtil = require("./util/db")
-const { Band, Character } = require("./models");
+const { Group, Character } = require("./models");
 
 const logger = new Console({
     stdout: process.stdout,
@@ -13,37 +13,37 @@ const logger = new Console({
 async function runImport() {
     dbUtil.syncDb();
     db = dbUtil.getDb();
-    await importBands();
+    await importGroups();
     await importCharacters();
 }
 
-async function importBands() {
-    const bandFiles = fs.readdirSync("./assets/import/bands").filter(file => file.endsWith(".json"));
+async function importGroups() {
+    const groupFiles = fs.readdirSync("./assets/import/groups").filter(file => file.endsWith(".json"));
     //read json file and parse it into a javascript object
-    for (const file of bandFiles) {
-        let band = fs.readFileSync(`./assets/import/bands/${file}`);
-        band = JSON.parse(band);
-        logger.log(`Importing band: ${band.name}`);
-        //check if band exists in database
-        let existingBand = await db.Band.findOne({
+    for (const file of groupFiles) {
+        let group = fs.readFileSync(`./assets/import/groups/${file}`);
+        group = JSON.parse(group);
+        logger.log(`Importing group: ${group.name}`);
+        //check if group exists in database
+        let existingGroup = await db.Group.findOne({
             where: {
-                name: band.name
+                name: group.name
             }
         })
 
-        if (existingBand) {
-            logger.log(`Band ${band.name} already exists in database`);
+        if (existingGroup) {
+            logger.log(`Group ${group.name} already exists in database`);
             continue;
         } else {
-            //create band in database
-            await db.Band.create({
-                id: band.id,
-                name: band.name,
-                description: band.description,
-                imageURL: band.imageURL,
-                enabled: band.enabled
+            //create group in database
+            await db.Group.create({
+                id: group.id,
+                name: group.name,
+                description: group.description,
+                imageURL: group.imageURL,
+                enabled: group.enabled
             });
-            logger.log(`Created band ${band.name} in database`);
+            logger.log(`Created group ${group.name} in database`);
         }
     }
 }
@@ -67,10 +67,10 @@ async function importCharacters() {
                 logger.log(`Character ${character.name} already exists in database`);
                 continue;
             } else {
-                //create band in database
+                //create group in database
                 await db.Character.create({
                     id: character.id,
-                    bandId: character.bandId,
+                    groupId: character.groupId,
                     name: character.name,
                     description: character.description,
                     imageIdentifier: character.imageIdentifier,
