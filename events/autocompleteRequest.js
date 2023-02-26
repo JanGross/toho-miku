@@ -1,9 +1,7 @@
 const { InteractionType } = require('discord.js');
-const { UserUtils } = require('../util');
-const { Card, Character, User, Group } = require('../models');
-const Sequelize = require('sequelize');
-const { QUALITY_NAMES } = require('../config/constants');
-const { TestStore } = require('../stores');
+const { UserUtils, SearchUtils } = require('../util');
+const { Character, Group } = require('../models');
+
 module.exports = {
     name: "interactionCreate",
     async execute (interaction) {
@@ -17,12 +15,12 @@ module.exports = {
         let choices = [];
         
         if (interaction.commandName === "burn") {
-            choices = await this.fetchCards(focusedOption, { user: user, ownedOnly: true });
+            choices = (await SearchUtils.findCards(focusedOption, { user: user, ownedOnly: true }))["choices"];
         }
 
         if (interaction.commandName === "trade") {
             if (focusedOption.name === "card") {
-                choices = await this.fetchCards(focusedOption, { user: user, ownedOnly: true });
+                choices = (await SearchUtils.findCards(focusedOption, { user: user, ownedOnly: true }))["choices"];
             }
         }
         
@@ -31,25 +29,13 @@ module.exports = {
 
             switch (viewType) {
                 case 'card':
-                    choices = await this.fetchCards(focusedOption, { user: user});
+                    choices = (await SearchUtils.findCards(focusedOption, { user: user}))["choices"];
+                    break;
                 case 'character':
-                    if(focusedOption.value.length < 3) break;
-                    const characters = await Character.findAll({
-                        where: {
-                            name: {
-                                [Sequelize.Op.like]: `%${focusedOption.value}%`
-                            }
-                        },
-                        limit: 10
-                    });
-                    for (let i = 0; i < characters.length; i++) {
-                        choices.push({
-                            name: characters[i].name,
-                            value: `${characters[i].id}`
-                        });
-                    }
+                    choices = (await SearchUtils.findByName(Character, focusedOption.value))["choices"];
                     break;
                 case 'group':
+                    choices = (await SearchUtils.findByName(Group, focusedOption.value))["choices"];
                     break;
             }
         }
@@ -60,38 +46,10 @@ module.exports = {
             //TODO: avoid duplicate code hehe
             switch (focusedOption.name) {
                 case 'character':
-                    if(focusedOption.value.length < 3) break;
-                    const characters = await Character.findAll({
-                        where: {
-                            name: {
-                                [Sequelize.Op.like]: `%${focusedOption.value}%`
-                            }
-                        },
-                        limit: 10
-                    });
-                    for (let i = 0; i < characters.length; i++) {
-                        choices.push({
-                            name: characters[i].name,
-                            value: `${characters[i].id}`
-                        });
-                    }
+                    choices = (await SearchUtils.findByName(Character, focusedOption.value))["choices"];
                     break;
                 case 'group':
-                    if(focusedOption.value.length < 3) break;
-                    const groups = await Group.findAll({
-                        where: {
-                            name: {
-                                [Sequelize.Op.like]: `%${focusedOption.value}%`
-                            }
-                        },
-                        limit: 10
-                    });
-                    for (let i = 0; i < groups.length; i++) {
-                        choices.push({
-                            name: groups[i].name,
-                            value: `${groups[i].id}`
-                        });
-                    }
+                    choices = (await SearchUtils.findByName(Group, focusedOption.value))["choices"];
                     break;
             }
         }
@@ -102,33 +60,4 @@ module.exports = {
         }
         return;
     },
-    async fetchCards (focusedOption, options={}) {
-        let choices = [];
-        let condition = {
-            where: {
-                [Sequelize.Op.or]: [
-                    {identifier: { [Sequelize.Op.like]: `%${focusedOption.value}%` }},
-                    {'$Character.name$': { [Sequelize.Op.like]: `%${focusedOption.value}%` }}
-                ],
-                burned: false
-            },
-            include: [{ model: Character }, { model: User }],
-            limit: 10
-        }
-        if (options.ownedOnly) {
-            condition.where.userId = { [Sequelize.Op.eq]: options.user.id };
-        }
-        const cards = await Card.findAll(condition);
-        for (let i = 0; i < cards.length; i++) {
-            let owned = "";
-            if (options.user) {
-                owned = cards[i].userId === options.user.id ? " (owned)" : "";
-            }
-            choices.push({
-                name: `${cards[i].identifier} - ${cards[i].Character.name} (${QUALITY_NAMES[cards[i].quality]})${owned}`,
-                value: cards[i].identifier
-            });
-        }
-        return choices;
-    }
 }
