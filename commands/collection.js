@@ -157,13 +157,13 @@ module.exports = {
         cards.rows = cards.rows ? cards.rows : cards;
         let pageStart = offset + 1;
         let pageEnd = offset + cards.rows.length;
-
+        let total = group ? cards.count.length : cards.count;
         //create embed using embedBuilder
         let embed = new EmbedBuilder()
             .setTitle(`$'s collection`)
             .setColor(0x00ff00)
             .setTimestamp()
-            .setFooter({ text: `Cards ${pageStart} - ${pageEnd} / ${cards.count}` });
+            .setFooter({ text: `Cards ${pageStart} - ${pageEnd} / ${total}` });
 
         //if the user has no cards, tell him
         if (cards.count === 0) {
