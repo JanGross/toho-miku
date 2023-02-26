@@ -96,6 +96,7 @@ module.exports = {
             }
         }
         if (choices.length > 0) {
+            choices = choices.splice(0,10);
             console.log(choices);
             await interaction.respond(choices);
         }
@@ -105,9 +106,10 @@ module.exports = {
         let choices = [];
         let condition = {
             where: {
-                identifier: {
-                    [Sequelize.Op.like]: `%${focusedOption.value}%`
-                },
+                [Sequelize.Op.or]: [
+                    {identifier: { [Sequelize.Op.like]: `%${focusedOption.value}%` }},
+                    {'$Character.name$': { [Sequelize.Op.like]: `%${focusedOption.value}%` }}
+                ],
                 burned: false
             },
             include: [{ model: Character }, { model: User }],
