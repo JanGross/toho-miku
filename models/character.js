@@ -11,6 +11,8 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Character.belongsTo(models.Group, { foreignKey: 'groupId', });
+      // A character can belong to many badges
+      Character.belongsToMany(models.Badge, { through: 'BadgeCharacter' });
     }
   }
   Character.init({

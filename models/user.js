@@ -17,6 +17,8 @@ module.exports = (sequelize, DataTypes) => {
       User.hasMany(models.Card);
       User.hasMany(models.CurrencyHistory);
       User.hasOne(models.Profile);
+      // A user can have many badges
+      User.belongsToMany(models.Badge, { through: 'BadgeUser' });
     }
     async addExperience(amount, source='unknown') {
       console.log(`Adding ${amount} experience to user ${this.id}`);
