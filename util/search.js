@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const { Card, Character, User } = require('../models');
+const { Card, Character, User, Badge } = require('../models');
 const { QUALITY_NAMES } = require('../config/constants');
 
 module.exports = {
@@ -54,5 +54,34 @@ module.exports = {
             });
         }
         return { "rows": cards, "choices": choices };
+    },
+
+    findBadges: async function(search, options={}, lim=0) {
+        let choices = [];
+        let condition = {
+            where: {
+                [Sequelize.Op.or]: [
+                    {name: { [Sequelize.Op.like]: `%${search}%` }},
+                    {id: { [Sequelize.Op.like]: `%${search}%` }}
+                ],
+            },
+            include: [{ model: Character }, { model: User }],
+        }
+        if (options.ownedOnly) {
+            condition.where.userId = { [Sequelize.Op.eq]: options.user.id };
+        }
+          
+        const badges = await Badge.findAll(condition);
+        for (let i = 0; i < badges.length; i++) {
+            let owned = "";
+            if (options.user) {
+                owned = badges[i].userId === options.user.id ? " (owned)" : "";
+            }
+            choices.push({
+                name: `${badges[i].id} - ${badges[i].name} ${owned}`,
+                value: badges[i].id
+            });
+        }
+        return { "rows": badges, "choices": choices };
     }
 }

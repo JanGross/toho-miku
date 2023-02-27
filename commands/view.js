@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, AttachmentBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
-const { Card, User, Group, Character } = require("../models");
+const { Card, User, Group, Character, Badge } = require("../models");
 const { Rendering, UserUtils } = require("../util");
 const { QUALITY_NAMES } = require("../config/constants");
 const fs = require("fs");
@@ -9,13 +9,14 @@ const edit = require("./edit");
 module.exports = {
     data: new SlashCommandBuilder()
             .setName("view")
-            .setDescription("View a specific card")
+            .setDescription("View a specific thing")
             .addStringOption((option) =>
                 option
                     .setName("type")
                     .setDescription("The thing to view")
                     .setRequired(true)
                     .addChoices(
+                        { name: 'badge', value: 'badge' },
                         { name: 'card', value: 'card' },
                         { name: 'character', value: 'character' },
                         { name: 'group', value: 'group' }
@@ -33,6 +34,9 @@ module.exports = {
         await interaction.deferReply();
 
         switch (interaction.options.getString("type")) {
+            case "badge":
+                this.viewBadge(interaction, interaction.options.getString("id"));
+                break;
             case "card":
                 this.viewCard(interaction, interaction.options.getString("id"));
                 break;
@@ -168,5 +172,30 @@ module.exports = {
                 await edit.execute(m, 'character', character.id);
             }
         });
+    },
+
+    async viewBadge(interaction, badgeId) {
+        let badge = await Badge.findOne({ 
+            where: { id: badgeId },
+            include: [Character]
+        });
+
+        let required = "";
+        badge.Characters.forEach(character => {
+            required += `_[${character.id}]_ ${character.name} \n`;
+        });
+
+        const embed = new EmbedBuilder()
+            .setTitle(`${badge.name}`)
+            .setDescription(badge.description)
+            .setImage(badge.image)
+            .addFields(
+                { name: "Required characters:", value: `${required}` },
+            )
+            .setColor(0x00ff00)
+            .setFooter({ text: `Badge viewed by ${interaction.member.displayName}` });
+
+        let replyPayload = { embeds: [embed], fetchReply: true }
+        const message = await interaction.editReply(replyPayload);
     }
 }
