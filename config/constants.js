@@ -62,6 +62,56 @@ const QUALITY_VALUES = {
     }
 }
 
+const PATREON = {
+    tiers: {
+        1 : {
+            modifiers: {
+                drops: 1,
+                claims: 0,
+                wishlist: 5,
+                currency: 1,
+                daily: 1
+            }
+        },
+        2 : {
+            modifiers: {
+                drops: 1,
+                claims: 2,
+                wishlist: 10,
+                currency: 1,
+                daily: 1
+            }
+        },
+        3 : {
+            modifiers: {
+                drops: 2,
+                claims: 6,
+                wishlist: 15,
+                currency: 1.25,
+                daily: 1
+            }
+        },
+        4 : {
+            modifiers: {
+                drops: 2,
+                claims: 8,
+                wishlist: 25,
+                currency: 2,
+                daily: 1
+            }
+        },
+        4 : {
+            modifiers: {
+                drops: 4,
+                claims: 14,
+                wishlist: 45,
+                currency: 2,
+                daily: 4
+            }
+        }
+    }
+}
+
 exports.QUALITY = QUALITY;
 exports.QUALITY_NAMES = QUALITY_NAMES;
 exports.CURRENCY_SYMBOLS = CURRENCY_SYMBOLS;
