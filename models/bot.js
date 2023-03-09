@@ -16,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   Bot.init({
     maintenance: DataTypes.BOOLEAN,
     adminIDs: DataTypes.STRING,
+    patreonTierRoles: DataTypes.STRING,
     pullTimeout: DataTypes.INTEGER,
     dropTimeout: DataTypes.INTEGER
   }, {

@@ -103,8 +103,10 @@ module.exports = (sequelize, DataTypes) => {
     experience: DataTypes.INTEGER,
     primaryCurrency: DataTypes.INTEGER,
     secondaryCurrency: DataTypes.INTEGER,
-    nextDrop: DataTypes.DATE,
-    nextPull: DataTypes.DATE,
+    remainingDrops: DataTypes.INTEGER,
+    remainingClaims: DataTypes.INTEGER,
+    nextDropReset: DataTypes.DATE,
+    nextClaimReset: DataTypes.DATE,
     nextDaily: DataTypes.DATE
   }, {
     hooks: {
