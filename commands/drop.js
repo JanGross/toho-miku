@@ -121,7 +121,7 @@ module.exports = {
         //set users drop cooldown
         await UserUtils.setCooldown(user, "drop", await GeneralUtils.getBotProperty("dropTimeout"));
 
-        const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 25000 });
+        const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
         
         let collectionReplies = [];
         collector.on('collect', async i => {
