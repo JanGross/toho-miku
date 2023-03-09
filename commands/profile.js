@@ -28,11 +28,12 @@ module.exports = {
 
         let profile = await user.getProfile();
 
-        let customStatus = profile.customStatus.replace(/(.{0,40}[\s])/g, '<tspan x="443" dy="1.2em">$1</tspan>');
+        let customStatus = this.encodeStr(profile.customStatus);
+        customStatus = customStatus.replace(/(.{0,40}[\s])/g, '<tspan x="443" dy="1.2em">$1</tspan>');
           
         let profileTemplate = fs.readFileSync('/app/assets/profile/profile.svg').toString();
         profileTemplate = profileTemplate.replace(/{{USERNAME}}/g, this.encodeStr(discordUser.username.substr(0,15)+(discordUser.username.length>15?'...':'')));
-        profileTemplate = profileTemplate.replace(/{{PROFILE_TEXT}}/g, this.encodeStr(customStatus) );
+        profileTemplate = profileTemplate.replace(/{{PROFILE_TEXT}}/g, customStatus );
         profileTemplate = profileTemplate.replace(/{{HEADER_COLOR}}/g, '190,31,97');
         profileTemplate = profileTemplate.replace(/{{CC}}/g, await Card.count({where: {userId: user.id}}));
         profileTemplate = profileTemplate.replace(/{{LVL}}/g, await user.level().currentLevel);
