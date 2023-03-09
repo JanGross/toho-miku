@@ -42,6 +42,7 @@ module.exports = {
     permissionLevel: 0,
     async execute(interaction) {
         let user = await UserUtils.getUserByDiscordId(interaction.member.id);
+        user.displayName = interaction.member.displayName; //FIXME: manually attaching the displayName is very hacky. We need to find a better way of passing along usernames!
         let offset = 0;
         let groupDupes = false;
         const uid = interaction.id;
@@ -160,7 +161,7 @@ module.exports = {
         let total = group ? cards.count.length : cards.count;
         //create embed using embedBuilder
         let embed = new EmbedBuilder()
-            .setTitle(`$'s collection`)
+            .setTitle(`${user.displayName}'s collection`)
             .setColor(0x00ff00)
             .setTimestamp()
             .setFooter({ text: `Cards ${pageStart} - ${pageEnd} / ${total}` });
