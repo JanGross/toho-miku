@@ -100,7 +100,7 @@ const PATREON = {
                 daily: 1
             }
         },
-        4 : {
+        5 : {
             modifiers: {
                 drops: 4,
                 claims: 14,
@@ -118,3 +118,4 @@ exports.CURRENCY_SYMBOLS = CURRENCY_SYMBOLS;
 exports.QUALITY_SYMBOLS = QUALITY_SYMBOLS;
 exports.CURRENCY_NAMES = CURRENCY_NAMES;
 exports.QUALITY_VALUES = QUALITY_VALUES;
+exports.PATREON = PATREON;
