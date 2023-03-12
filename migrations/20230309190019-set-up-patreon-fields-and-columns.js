@@ -29,7 +29,7 @@ module.exports = {
       defaultValue: 1
     });
     await queryInterface.addColumn('Bots', 'patreonTierRoles', {
-      type: Sequelize.INTEGER,
+      type: Sequelize.STRING,
       defaultValue: 1
     });
   },
