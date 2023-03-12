@@ -63,7 +63,8 @@ const QUALITY_VALUES = {
 }
 
 const PATREON = {
-    tiers: {
+    roleServer : '441300798819794944',
+    tiers : {
         1 : {
             modifiers: {
                 drops: 1,

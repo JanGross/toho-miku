@@ -2,6 +2,7 @@ const { SlashCommandBuilder, ComponentType, ActionRowBuilder, ButtonBuilder, But
 const { customAlphabet } = require("nanoid");
 const { Card, User } = require("../models");
 const { UserUtils, CardUtils, GeneralUtils } = require("../util");
+const { PATREON } = require("../config/constants");
 const stores = require("../stores");
 require('dotenv').config();
 
@@ -26,6 +27,7 @@ module.exports = {
                         { name: 'add_secondary', value: 'add_secondary' },
                         { name: 'toggle_maintenance', value: 'toggle_maintenance' },
                         { name: 'store', value: 'store' },
+                        { name: 'patreon', value: 'patreon' }
                     )
                 )
             .addStringOption((option) =>
@@ -151,6 +153,15 @@ module.exports = {
                 content: `${JSON.stringify(stores)}`,
                 ephemeral: false
             });
+            break;
+        case "patreon":
+            interaction.editReply({
+                content: `${JSON.stringify(user)}`,
+                ephemeral: false
+            });
+            
+            let patreon = await UserUtils.getPatreonPerks(interaction.client, interaction.member);
+            interaction.channel.send(JSON.stringify(patreon));
             break;
         default:
             interaction.editReply({

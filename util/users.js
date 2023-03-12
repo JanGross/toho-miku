@@ -1,5 +1,6 @@
 const { User, Guild } = require("../models");
 const GeneralUtils = require("./general");
+const { PATREON } = require("../config/constants");
 
 module.exports = {
     name: "UserUtils",
@@ -102,5 +103,31 @@ module.exports = {
 
         //Regular User
         return 0;
+    },
+
+    getPatreonPerks: async function(client, member) {
+        /** Returns the users highest Patreon tier and its associated perks
+         * client: Discord client instance available via interaction.client
+         * member: Discord member instance
+         * 
+         * returns
+         * tier: 0 if not subscribed
+         *      1-n as per role mapping in the DB (e.g. {"1083018874263453868":1,"1083018984921759744":2})
+         * perks: modifiers associated with the tier 
+         */
+
+        let patreonRoles = await GeneralUtils.getBotProperty("patreonTierRoles");
+        patreonRoles = JSON.parse(patreonRoles);
+        const guild = await client.guilds.fetch(PATREON.roleServer);
+        const guildMember = await guild.members.fetch(member.id);
+        let highestRole = 0;
+        for (const [role, tier] of Object.entries(patreonRoles)) {
+            const matchedRole = guildMember.roles.cache.get(role);
+            if(matchedRole) {
+                highestRole = Math.max(highestRole, tier);
+            }
+        }            
+        let perks = PATREON.tiers[highestRole];
+        return { "tier": highestRole, "perks": perks };
     }
 }
