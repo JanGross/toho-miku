@@ -95,7 +95,7 @@ module.exports = {
             });
             break;
         case "cooldowns":
-            const timeouts = await UserUtils.getCooldowns(user);
+            const timeouts = await UserUtils.getCooldowns(extUser);
             console.log(`UserTimeouts: ${JSON.stringify(timeouts)}`);
             let timeoutInMinutes = 0;
             interaction.editReply({
@@ -160,7 +160,7 @@ module.exports = {
                 ephemeral: false
             });
             
-            let patreon = await UserUtils.getPatreonPerks(interaction.client, interaction.member);
+            let patreon = await UserUtils.getPatreonPerks(interaction.client, user);
             interaction.channel.send(JSON.stringify(patreon));
             break;
         default:

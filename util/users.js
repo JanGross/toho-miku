@@ -30,46 +30,109 @@ module.exports = {
         return false;
     },
 
-    getCooldowns: async function(user) {
+    getCooldowns: async function(user, tier) {
         /* Returns an object with the following properties:
             * now: the current time in milliseconds
-            --- For each key in cooldownKeys ---
-                * nextPullTimestamp: the next time the user can pull a card in milliseconds
-                * pullCooldown: time in milliseconds until the user can pull again
-                * pullCooldownFormatted: print friendly version of pullCooldown in hours and minutes
+            * nextClaimReset: time in milliseconds until the claims are reset
+            * remainingClaims: amount of claims remaining
+            * nextDropReset: time in milliseconds until the drops are reset
+            * remainingDrops: amount of claims remaining
+            * nextDaily: time in milliseconds until the next /daily can be used
         */
 
-        const cooldownKeys = ["Pull", "Drop", "Daily"]
+        const cooldownKeys = ["nextClaimReset", "nextDropReset"]
 
         let reply = {
             now: new Date().getTime()
         };
 
+        //Claims
+        reply['nextClaimReset'] = Math.max(user['nextClaimReset'].getTime() - reply['now'], 0);
+        reply['nextClaimTStamp'] = user['nextClaimReset'].getTime();
+        
+        //No remamning claims but reset reached
+        if (user['remainingClaims'] <= 0 && reply['nextClaimReset'] <= 0) {
+            user['remainingClaims'] = 1 + (tier ? PATREON.tiers[tier].modifiers.claims : 0);
+        }
+        reply['remainingClaims'] = user['remainingClaims'];
+        
+        //Drops
+        reply['nextDropReset'] = Math.max(user['nextDropReset'].getTime() - reply['now'], 0);
+        reply['nextDropTStamp'] = user['nextDropReset'].getTime();
+        //No remamning claims but reset reached
+        if (user['remainingDrops'] <= 0 && reply['nextDropReset'] <= 0) {
+            user['remainingDrops'] = 1 + (tier ? PATREON.tiers[tier].modifiers.drops : 0);
+        }
+        reply['remainingDrops'] = user['remainingDrops'];
+
+        //Daily
+        reply['nextDaily'] = Math.max(user['nextDaily'].getTime() - reply['now'], 0);
+        reply['nextDailyTStamp'] = user['nextDaily'].getTime();
+
+        reply[`nextDailyFormatted`] = reply['nextDaily'] > 0 ? `Resets <t:${parseInt(reply['nextDailyTStamp'] / 1000)}>` : `Ready!`;
         for (key of cooldownKeys) {
-            reply[`next${key}Timestamp`] = user[`next${key}`].getTime();
-            let cooldown = Math.max(reply[`next${key}Timestamp`] - reply['now'], 0);
-            reply[`${key.toLowerCase()}Cooldown`] = cooldown;
+            reply[`${key}Timestamp`] = user[key].getTime();
+            let cooldown = reply[key]
             let hours = Math.floor(cooldown / 3600000);
             let minutes = Math.floor((cooldown % 3600000) / 60000);
             let seconds = Math.floor((cooldown % 60000) / 1000);
             if (cooldown > 0) {
-                reply[`${key.toLowerCase()}CooldownFormatted`] = `Next ${key} in ` + (hours >= 1 ? `${hours} hour${hours > 1 ? 's' : ''} ` : '') + 
-                                                                `${minutes} minute${minutes > 1 ? 's' : ''} ` +
-                                                                `${seconds} second${seconds > 1 ? 's' : ''}`;
+                reply[`${key}Formatted`] = `${(hours >= 1 ? `${hours} hour${hours > 1 ? 's' : ''} ` : '')}`
+                if (minutes > 0) {
+                    reply[`${key}Formatted`] += `${minutes} minute${minutes > 1 ? 's' : ''} `;
+                }
+                if (seconds > 0) {
+                    reply[`${key}Formatted`] += `${seconds} second${seconds > 1 ? 's' : ''}`;
+                }
+                                                                 
             } else {
-                reply[`${key.toLowerCase()}CooldownFormatted`] = `${key} Ready!`;
+                reply[`${key}Formatted`] = `Ready! `;
             }
         }
- 
+        
+        //Persists any potential resets
+        await user.save();
         return reply;
     },
 
+    actionHandler: async function(user, actionType) {
+        /* 
+         * cooldownType: "claim", "drop", "daily"
+         * user: native user object        
+         */
+        console.log(`PROCESSING ACTION HANDLER: ${actionType} for user ${user.id}`);
+        switch (actionType) {
+            case "drop":
+                user['remainingDrops'] -= 1
+                if (user['remainingDrops'] <= 0) {
+                    let dropTimeout = await GeneralUtils.getBotProperty("dropTimeout");
+                    
+                    user['nextDropReset'] = new Date(new Date().getTime() + dropTimeout);
+                }
+                console.log(`Drop for user ${user.id} persisting with value ${user['remainingDrops']} next drop at ${user['nextDropReset']}`);
+                await user.save();
+                break;
+            case "claim":
+                user['remainingClaims'] -= 1
+                if (user['remainingClaims'] <= 0) {
+                    let claimTimeout = await GeneralUtils.getBotProperty("claimTimeout");
+                    
+                    user['nextClaimReset'] = new Date(new Date().getTime() + claimTimeout);
+                }
+                console.log(`Claim for user ${user.id} persisting with value ${user['remainingClaims']} next claim at ${user['nextClaimReset']}`);
+                await user.save();
+                break;
+            default:
+                break;
+        }
+    },
+
     setCooldown: async function(user, cooldownType, cooldown) {
-        /* cooldownType: "pull", "drop", "daily"
+        /* cooldownType: "claim", "drop"
          * cooldown: time in milliseconds
          */
         let newCooldown = new Date(new Date().getTime() + cooldown);
-        user[`next${cooldownType[0].toUpperCase() + cooldownType.slice(1)}`] = newCooldown;
+        user[`next${cooldownType[0].toUpperCase() + cooldownType.slice(1)}Reset`] = newCooldown;
         await user.save();
     },
 
@@ -105,10 +168,10 @@ module.exports = {
         return 0;
     },
 
-    getPatreonPerks: async function(client, member) {
+    getPatreonPerks: async function(client, user) {
         /** Returns the users highest Patreon tier and its associated perks
          * client: Discord client instance available via interaction.client
-         * member: Discord member instance
+         * user: Native user instance
          * 
          * returns
          * tier: 0 if not subscribed
@@ -119,7 +182,7 @@ module.exports = {
         let patreonRoles = await GeneralUtils.getBotProperty("patreonTierRoles");
         patreonRoles = JSON.parse(patreonRoles);
         const guild = await client.guilds.fetch(PATREON.roleServer);
-        const guildMember = await guild.members.fetch(member.id);
+        const guildMember = await guild.members.fetch(user.discordId);
         let highestRole = 0;
         for (const [role, tier] of Object.entries(patreonRoles)) {
             const matchedRole = guildMember.roles.cache.get(role);
