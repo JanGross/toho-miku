@@ -111,7 +111,7 @@ module.exports = {
             });
             break;
         case "reset_cd":
-            await UserUtils.setCooldown(extUser, "pull", 1);
+            await UserUtils.setCooldown(extUser, "claim", 1);
             await UserUtils.setCooldown(extUser, "drop", 1);
             await UserUtils.setCooldown(extUser, "daily", 1);
             interaction.editReply({
