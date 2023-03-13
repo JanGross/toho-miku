@@ -142,7 +142,7 @@ module.exports = {
             if (claimUser) {
                 //Update card with the user id
                 cards[cardId].userId = claimUser.id;
-                await UserUtils.actionHandler(user, "claim");
+                await UserUtils.actionHandler(claimUser, "claim");
                 await cards[cardId].save();
                 let historyEntry = {
                     userId: claimUser.id,
