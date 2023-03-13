@@ -19,13 +19,13 @@ module.exports = {
         if (cooldowns.remainingDrops > 0) {
             reply += `Drop: ${cooldowns.remainingDrops} remaining\n`;
         } else {
-            reply += `Drop: Resets in ${cooldowns.nextDropResetFormatted}\n`;
+            reply += `Drop: Reset ${cooldowns.nextDropResetFormatted}\n`;
         }
         
         if (cooldowns.remainingClaims > 0) {
             reply += `Claim: ${cooldowns.remainingClaims} remaining\n`;
         } else {
-            reply += `Claim: Resets in ${cooldowns.nextClaimResetFormatted}\n`;
+            reply += `Claim: Reset ${cooldowns.nextClaimResetFormatted}\n`;
         }
 
         if (cooldowns.nextDaily > 0) {

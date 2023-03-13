@@ -48,7 +48,6 @@ module.exports = {
 
         //Claims
         reply['nextClaimReset'] = Math.max(user['nextClaimReset'].getTime() - reply['now'], 0);
-        reply['nextClaimTStamp'] = user['nextClaimReset'].getTime();
         
         //No remamning claims but reset reached
         if (user['remainingClaims'] <= 0 && reply['nextClaimReset'] <= 0) {
@@ -58,7 +57,6 @@ module.exports = {
         
         //Drops
         reply['nextDropReset'] = Math.max(user['nextDropReset'].getTime() - reply['now'], 0);
-        reply['nextDropTStamp'] = user['nextDropReset'].getTime();
         //No remamning claims but reset reached
         if (user['remainingDrops'] <= 0 && reply['nextDropReset'] <= 0) {
             user['remainingDrops'] = 1 + (tier ? PATREON.tiers[tier].modifiers.drops : 0);
@@ -69,25 +67,11 @@ module.exports = {
         reply['nextDaily'] = Math.max(user['nextDaily'].getTime() - reply['now'], 0);
         reply['nextDailyTStamp'] = user['nextDaily'].getTime();
 
-        reply[`nextDailyFormatted`] = reply['nextDaily'] > 0 ? `<t:${parseInt(reply['nextDailyTStamp'] / 1000)}>` : `Ready!`;
+        reply[`nextDailyFormatted`] = reply['nextDaily'] > 0 ? `<t:${parseInt(reply['nextDailyTStamp'] / 1000)}:R>` : `Ready!`;
         for (key of cooldownKeys) {
+            let cooldown = reply[key];
             reply[`${key}Timestamp`] = user[key].getTime();
-            let cooldown = reply[key]
-            let hours = Math.floor(cooldown / 3600000);
-            let minutes = Math.floor((cooldown % 3600000) / 60000);
-            let seconds = Math.floor((cooldown % 60000) / 1000);
-            if (cooldown > 0) {
-                reply[`${key}Formatted`] = `${(hours >= 1 ? `${hours} hour${hours > 1 ? 's' : ''} ` : '')}`
-                if (minutes > 0) {
-                    reply[`${key}Formatted`] += `${minutes} minute${minutes > 1 ? 's' : ''} `;
-                }
-                if (seconds > 0) {
-                    reply[`${key}Formatted`] += `${seconds} second${seconds > 1 ? 's' : ''}`;
-                }
-                                                                 
-            } else {
-                reply[`${key}Formatted`] = `Ready! `;
-            }
+            reply[`${key}Formatted`] = cooldown > 0 ? `<t:${parseInt(reply[`${key}Timestamp`] / 1000)}:R>` : `Ready!`;
         }
         
         //Persists any potential resets
