@@ -156,11 +156,11 @@ module.exports = {
             break;
         case "patreon":
             interaction.editReply({
-                content: `${JSON.stringify(user)}`,
+                content: `${JSON.stringify(extUser ? extUser : user)}`,
                 ephemeral: false
             });
             
-            let patreon = await UserUtils.getPatreonPerks(interaction.client, user);
+            let patreon = await UserUtils.getPatreonPerks(interaction.client, extUser ? extUser : user);
             interaction.channel.send(JSON.stringify(patreon));
             break;
         default:
