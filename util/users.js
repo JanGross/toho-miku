@@ -69,7 +69,7 @@ module.exports = {
         reply['nextDaily'] = Math.max(user['nextDaily'].getTime() - reply['now'], 0);
         reply['nextDailyTStamp'] = user['nextDaily'].getTime();
 
-        reply[`nextDailyFormatted`] = reply['nextDaily'] > 0 ? `Resets <t:${parseInt(reply['nextDailyTStamp'] / 1000)}>` : `Ready!`;
+        reply[`nextDailyFormatted`] = reply['nextDaily'] > 0 ? `<t:${parseInt(reply['nextDailyTStamp'] / 1000)}>` : `Ready!`;
         for (key of cooldownKeys) {
             reply[`${key}Timestamp`] = user[key].getTime();
             let cooldown = reply[key]
@@ -120,6 +120,11 @@ module.exports = {
                     user['nextClaimReset'] = new Date(new Date().getTime() + claimTimeout);
                 }
                 console.log(`Claim for user ${user.id} persisting with value ${user['remainingClaims']} next claim at ${user['nextClaimReset']}`);
+                await user.save();
+                break;
+            case "daily":
+                let dailyTimeout = 86400000; //24 Hours
+                user['nextDaily'] = new Date(new Date().getTime() + dailyTimeout);
                 await user.save();
                 break;
             default:
@@ -177,6 +182,11 @@ module.exports = {
          * tier: 0 if not subscribed
          *      1-n as per role mapping in the DB (e.g. {"1083018874263453868":1,"1083018984921759744":2})
          * perks: modifiers associated with the tier 
+         *   modifiers: {
+         *       drops: 0,
+         *       claims: 1,
+         *       [...]
+         *   }
          */
 
         let patreonRoles = await GeneralUtils.getBotProperty("patreonTierRoles");

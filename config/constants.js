@@ -62,6 +62,12 @@ const QUALITY_VALUES = {
     }
 }
 
+const DAILY_REWARDS = {
+    primary_currency : 250,
+    secondary_currency : 5,
+    experience : 50
+}
+
 const PATREON = {
     roleServer : '441300798819794944',
     tiers : {
@@ -119,4 +125,5 @@ exports.CURRENCY_SYMBOLS = CURRENCY_SYMBOLS;
 exports.QUALITY_SYMBOLS = QUALITY_SYMBOLS;
 exports.CURRENCY_NAMES = CURRENCY_NAMES;
 exports.QUALITY_VALUES = QUALITY_VALUES;
+exports.DAILY_REWARDS = DAILY_REWARDS;
 exports.PATREON = PATREON;
