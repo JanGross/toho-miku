@@ -86,7 +86,7 @@ const PATREON = {
                 claims: 2,
                 wishlist: 10,
                 currency: 1,
-                daily: 1
+                daily: 1.25
             }
         },
         3 : {
@@ -95,7 +95,7 @@ const PATREON = {
                 claims: 6,
                 wishlist: 15,
                 currency: 1.25,
-                daily: 1
+                daily: 1.5
             }
         },
         4 : {
@@ -103,8 +103,8 @@ const PATREON = {
                 drops: 2,
                 claims: 8,
                 wishlist: 25,
-                currency: 2,
-                daily: 1
+                currency: 1.75,
+                daily: 2
             }
         },
         5 : {
