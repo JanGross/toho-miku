@@ -67,8 +67,8 @@ const PATREON = {
     tiers : {
         1 : {
             modifiers: {
-                drops: 1,
-                claims: 0,
+                drops: 0,
+                claims: 1,
                 wishlist: 5,
                 currency: 1,
                 daily: 1
