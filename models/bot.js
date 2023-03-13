@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
     maintenance: DataTypes.BOOLEAN,
     adminIDs: DataTypes.STRING,
     patreonTierRoles: DataTypes.STRING,
-    pullTimeout: DataTypes.INTEGER,
+    claimTimeout: DataTypes.INTEGER,
     dropTimeout: DataTypes.INTEGER
   }, {
     sequelize,
