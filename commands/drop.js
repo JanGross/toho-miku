@@ -16,14 +16,16 @@ module.exports = {
         
         let permissionLevel = await UserUtils.getPermissionLevel(interaction.member);
         const cooldowns = await UserUtils.getCooldowns(user);
-        if (cooldowns.dropCooldown > 0 && permissionLevel < 2) {
+
+        //Can't drop if no drops remain    nextReset hasn't been reached   User is not a global admin
+        if (cooldowns.remainingDrops <= 0 && cooldowns.nextDropReset > 0 && permissionLevel < 9) {
             interaction.editReply({
-                content: `You can't drop a card yet! ${cooldowns.dropCooldownFormatted}`,
+                content: `You can't drop a card yet! \nReset in ${cooldowns.nextDropResetFormatted}`,
                 ephemeral: false
             });
             return;
         }
-        
+
         //Generate 3 cards, each is persisted with an initial userId of NULL
         const cards = [];
         let characters = await Character.findAll({
@@ -117,9 +119,7 @@ module.exports = {
             type: 0
         });
 
-		//const message = await interaction.editReply({ content: reply, components: [row], fetchReply: true });
-        //set users drop cooldown
-        await UserUtils.setCooldown(user, "drop", await GeneralUtils.getBotProperty("dropTimeout"));
+        await UserUtils.actionHandler(user, "drop");
 
         const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
         
@@ -131,9 +131,9 @@ module.exports = {
             let claimUser = await UserUtils.getUserByDiscordId(i.user.id);
             let cooldowns = await UserUtils.getCooldowns(claimUser);
             let permissionLevel = await UserUtils.getPermissionLevel(i.member);
-            if (cooldowns.pullCooldown > 0 && permissionLevel < 2) {
+            if (cooldowns.remainingClaims <= 0 && cooldowns.nextClaimReset > 0 && permissionLevel < 9) {
                 i.reply({
-                    content: `You can't claim a card yet! ${cooldowns.pullCooldownFormatted}`,  
+                    content: `${i.user} You can't claim a card yet! \nReset in ${cooldowns.nextClaimResetFormatted}`,  
                     ephemeral: false
                 });
                 return;
@@ -142,7 +142,7 @@ module.exports = {
             if (claimUser) {
                 //Update card with the user id
                 cards[cardId].userId = claimUser.id;
-                await UserUtils.setCooldown(claimUser, "pull", await GeneralUtils.getBotProperty("pullTimeout"));
+                await UserUtils.actionHandler(user, "claim");
                 await cards[cardId].save();
                 let historyEntry = {
                     userId: claimUser.id,
