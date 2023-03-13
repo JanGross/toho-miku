@@ -18,7 +18,7 @@ module.exports = {
         const cooldowns = await UserUtils.getCooldowns(user);
 
         //Can't drop if no drops remain    nextReset hasn't been reached   User is not a global admin
-        if (cooldowns.remainingDrops <= 0 && cooldowns.nextDropReset > 0 && permissionLevel < 9) {
+        if (cooldowns.remainingDrops <= 0 && cooldowns.nextDropReset > 0 && permissionLevel < 2) {
             interaction.editReply({
                 content: `You can't drop a card yet! \nReset in ${cooldowns.nextDropResetFormatted}`,
                 ephemeral: false
@@ -131,7 +131,7 @@ module.exports = {
             let claimUser = await UserUtils.getUserByDiscordId(i.user.id);
             let cooldowns = await UserUtils.getCooldowns(claimUser);
             let permissionLevel = await UserUtils.getPermissionLevel(i.member);
-            if (cooldowns.remainingClaims <= 0 && cooldowns.nextClaimReset > 0 && permissionLevel < 9) {
+            if (cooldowns.remainingClaims <= 0 && cooldowns.nextClaimReset > 0 && permissionLevel < 2) {
                 i.reply({
                     content: `${i.user} You can't claim a card yet! \nReset in ${cooldowns.nextClaimResetFormatted}`,  
                     ephemeral: false
