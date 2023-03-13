@@ -13,14 +13,25 @@ module.exports = {
         const user = await UserUtils.getUserByDiscordId(interaction.member.id);
 
         //get user cooldowns using user utils
-        const cooldowns = await UserUtils.getCooldowns(user);
+        const cooldowns = await UserUtils.getCooldowns(user, (await UserUtils.getPatreonPerks(interaction.client, user))['tier']);
 
         let reply = "Cooldowns:\n";
-        for (cooldown in cooldowns) {
-            //if cooldown contains the string formatted 
-            if (cooldown.includes("Formatted")) {
-                reply += `${cooldowns[cooldown]}\n`;
-            }
+        if (cooldowns.remainingDrops > 0) {
+            reply += `Drop: ${cooldowns.remainingDrops} remaining\n`;
+        } else {
+            reply += `Drop: Resets in ${cooldowns.nextDropResetFormatted}\n`;
+        }
+        
+        if (cooldowns.remainingClaims > 0) {
+            reply += `Claim: ${cooldowns.remainingClaims} remaining\n`;
+        } else {
+            reply += `Claim: Resets in ${cooldowns.nextClaimResetFormatted}\n`;
+        }
+
+        if (cooldowns.nextDaily > 0) {
+            reply += `Daily: ${cooldowns.nextDailyFormatted}\n`;
+        } else {
+            reply += `Daily: Ready!\n`;
         }
 
         interaction.reply({
