@@ -22,9 +22,8 @@ module.exports = {
             return true;
         }
 
-        interaction.reply({
-            content: `${interaction.member} You are not registered, use the /register command`,
-            ephemeral: false
+        interaction.channel.send({
+            content: `${interaction.member} You are not registered, use the /register command`
         });
         
         return false;

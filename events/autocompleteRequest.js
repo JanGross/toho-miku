@@ -5,9 +5,9 @@ const { Character, Group } = require('../models');
 module.exports = {
     name: "interactionCreate",
     async execute (interaction) {
+        if (interaction.type !== InteractionType.ApplicationCommandAutocomplete) return;
         let isRegistered = await UserUtils.registrationCheck(interaction);
         if (!isRegistered) return;
-        if (interaction.type !== InteractionType.ApplicationCommandAutocomplete) return;
         console.log(`Autocomplete request from ${interaction.user.tag} (${interaction.user.id}) for ${interaction.commandName} with ${interaction.options.getFocused(true).value}`);
         
         let user = await UserUtils.getUserByDiscordId(interaction.member.id);
