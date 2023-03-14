@@ -129,7 +129,7 @@ module.exports = {
             if (await cards[cardId].userId) { i.reply({ content: "This card has already been claimed!", ephemeral: true }); return; }
 
             let claimUser = await UserUtils.getUserByDiscordId(i.user.id);
-            let cooldowns = await UserUtils.getCooldowns(claimUser);
+            let cooldowns = await UserUtils.getCooldowns(claimUser, (await UserUtils.getPatreonPerks(interaction.client, claimUser))['tier']);
             let permissionLevel = await UserUtils.getPermissionLevel(i.member);
             if (cooldowns.remainingClaims <= 0 && cooldowns.nextClaimReset > 0 && permissionLevel < 2) {
                 i.reply({
