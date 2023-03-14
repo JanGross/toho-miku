@@ -23,6 +23,9 @@ module.exports = {
             await User.create({
                 discordId: interaction.user.id,
                 active: 1,
+                nextDropReset: 0,
+                nextClaimReset: 0,
+                nextDaily: 0
             });
             interaction.editReply({
                 content: "You are now registered",
