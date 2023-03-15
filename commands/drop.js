@@ -15,7 +15,7 @@ module.exports = {
         const user = await UserUtils.getUserByDiscordId(interaction.member.id);
         
         let permissionLevel = await UserUtils.getPermissionLevel(interaction.member);
-        const cooldowns = await UserUtils.getCooldowns(user);
+        const cooldowns = await UserUtils.getCooldowns(user, (await UserUtils.getPatreonPerks(interaction.client, user))['tier']);
 
         //Can't drop if no drops remain    nextReset hasn't been reached   User is not a global admin
         if (cooldowns.remainingDrops <= 0 && cooldowns.nextDropReset > 0 && permissionLevel < 2) {
@@ -25,7 +25,9 @@ module.exports = {
             });
             return;
         }
-
+        
+        await UserUtils.actionHandler(user, "drop");
+        
         //Generate 3 cards, each is persisted with an initial userId of NULL
         const cards = [];
         let characters = await Character.findAll({
@@ -119,7 +121,6 @@ module.exports = {
             type: 0
         });
 
-        await UserUtils.actionHandler(user, "drop");
 
         const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
         
