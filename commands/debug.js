@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, ComponentType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { customAlphabet } = require("nanoid");
-const { Card, User } = require("../models");
+const { Card, User, Wishlist, Character } = require("../models");
 const { UserUtils, CardUtils, GeneralUtils } = require("../util");
 const { PATREON } = require("../config/constants");
 const stores = require("../stores");
@@ -27,6 +27,7 @@ module.exports = {
                         { name: 'add_secondary', value: 'add_secondary' },
                         { name: 'toggle_maintenance', value: 'toggle_maintenance' },
                         { name: 'store', value: 'store' },
+                        { name: 'wishlist', value: 'wishlist' },
                         { name: 'patreon', value: 'patreon' }
                     )
                 )
@@ -151,6 +152,24 @@ module.exports = {
         case "store":
             interaction.editReply({
                 content: `${JSON.stringify(stores)}`,
+                ephemeral: false
+            });
+            break;
+        case "wishlist":
+            let wishlists = await Wishlist.findAll({
+                attributes: ['id', 'UserId'],
+                include: [{
+                    model: Character,
+                    attributes: ['id'],
+                    where: { id: interaction.options.getString("value") },
+                },
+                {
+                    model: User,
+                    attributes: ['discordId']
+                }]
+            });
+            await interaction.editReply({
+                content: `${JSON.stringify(wishlists)}`,
                 ephemeral: false
             });
             break;
