@@ -1,4 +1,6 @@
 const { SlashCommandBuilder } = require("discord.js");
+const { Wishlist, Character } = require("../models");
+const UserUtils = require("../util/users");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -30,19 +32,47 @@ module.exports = {
                             .setAutocomplete(true)
                         )
                     ),
-    permissionLevel: 1,
+    permissionLevel: 0,
     async execute(interaction) {
         await interaction.deferReply();
-
+        let user = await UserUtils.getUserByDiscordId(interaction.member.id);
+        let wishlist = await Wishlist.findOne({
+            where: { UserId: user.id },
+            include: [{ model: Character }]
+        })
+        if(!wishlist) {
+            wishlist = await Wishlist.create({
+                ping: false,
+                UserId: user.id
+            });
+            interaction.channel.send("Created new wishlist");
+        }
         switch (interaction.options.getSubcommand()) {
             case "view":
-                await interaction.editReply("Viewing your wishlist");
+                let reply = `Wishlist entries (${wishlist.Characters.length}/5 used):\n`;
+                wishlist.Characters.forEach(character => {
+                    reply += `${character.name} \n`;
+                });
+                await interaction.editReply(reply);
                 break;
             case "compare":
                 await interaction.editReply("Comparing your wishlist");
                 break;
             case "edit":
-                await interaction.editReply("Editing your wishlist");
+                let character = await Character.findOne({ 
+                    where: { id: interaction.options.getString("character") }});
+
+                if (await wishlist.hasCharacter(character)) {
+                    await wishlist.removeCharacter(character)
+                    await interaction.editReply(`Removed ${character.name} from your wishlist! ${wishlist.Characters.length-1}/5 used`);
+                } else {
+                    if (wishlist.Characters.length < 5) {
+                        await wishlist.addCharacter(character);
+                        await interaction.editReply(`Added ${character.name} to your wishlist! ${wishlist.Characters.length+1}/5 used`);
+                    } else {
+                        await interaction.editReply(`You have no remaining wishlist slots! ${wishlist.Characters.length}`);
+                    }
+                }
                 break;
             default:
                 await interaction.editReply("hmmm");
