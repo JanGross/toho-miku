@@ -1,8 +1,9 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, AttachmentBuilder } = require("discord.js");
-const { Card, User, Character, DropHistory, sequelize } = require("../models");
+const { Card, User, Character, DropHistory, Wishlist, sequelize } = require("../models");
 const { customAlphabet } = require("nanoid");
 const { CardUtils, UserUtils, ReplyUtils, GeneralUtils, Rendering } = require("../util");
 const { QUALITY } = require("../config/constants");
+const Sequelize = require('sequelize');
 const card = require("../models/card");
 
 module.exports = {
@@ -25,14 +26,15 @@ module.exports = {
             });
             return;
         }
-        
+
         await UserUtils.actionHandler(user, "drop");
         
         //Generate 3 cards, each is persisted with an initial userId of NULL
         const cards = [];
         let characters = await Character.findAll({
             where: {
-                enabled: true
+                enabled: true,
+                [Sequelize.Op.or]: [ { id: 3 }, { id: 4 }, { id: 5 } ]
             },
             order: sequelize.random(),
             limit: 3
@@ -74,12 +76,13 @@ module.exports = {
             });
             cards.push(newCard);
         }
-
+        
         cards.sort((a, b) => a.characterId - b.characterId);
         
         const row = new ActionRowBuilder();
         let deckImage = await Rendering.renderCardStack(cards);
         let notableProps = [];
+        let pings = [];
         for (let i = 0; i < cards.length; i++) {
             //Add claim button and notable prop text for each card
             row.addComponents(
@@ -94,13 +97,37 @@ module.exports = {
             if (cards[i].printNr == 1) {
                 notableProps.push(`📦`);
             }
+
+            //send wishlist pings
+            let guildMembers  = [...(await interaction.guild.members.fetch()).keys()];
+            let wishlists = await Wishlist.findAll({
+                attributes: ['id', 'UserId'],
+                include: [{
+                    model: Character,
+                    attributes: ['name'],
+                    where: { id: cards[i].characterId },
+                },
+                {
+                    model: User,
+                    attributes: ['discordId']
+                }]
+            });
+            wishlists.forEach(wishlist => {
+                if(guildMembers.includes(wishlist.User.discordId)) {
+                    pings.push(`<@${wishlist.User.discordId}>`);
+                }
+            });
+            if (wishlists.length > 0) {
+                let debug = wishlists[0];
+                pings.push(`your wishlisted character ${debug.Characters[0].name} is in this drop!\n`);
+            }
         }
         //add 10 experience to the user
         await user.addExperience(10, 'drop');
 
         const file = new AttachmentBuilder(deckImage);
     
-        const message = await interaction.editReply({ content: `${interaction.member} Dropped 3 cards.\n${notableProps.join(" ")}`, components: [row], files: [file], fetchReply: true });
+        const message = await interaction.editReply({ content: `${interaction.member} Dropped 3 cards.\n${notableProps.join(" ")} \n${pings.join(' ')}`, components: [row], files: [file], fetchReply: true });
 
         let dropHistory = {
             dropper: user.id,
