@@ -39,6 +39,11 @@ module.exports = {
                     break;
             }
         }
+
+        if (interaction.commandName === 'wishlist') {
+            choices = (await SearchUtils.findByName(Character, focusedOption.value))["choices"];
+        }
+
         if (interaction.commandName === 'collection') {
             const character = interaction.options.getString('character');
             const group = interaction.options.getString('group');
