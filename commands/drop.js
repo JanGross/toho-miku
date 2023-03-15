@@ -33,8 +33,7 @@ module.exports = {
         const cards = [];
         let characters = await Character.findAll({
             where: {
-                enabled: true,
-                [Sequelize.Op.or]: [ { id: 3 }, { id: 4 }, { id: 5 } ]
+                enabled: true
             },
             order: sequelize.random(),
             limit: 3
