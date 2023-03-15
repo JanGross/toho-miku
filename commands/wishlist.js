@@ -43,9 +43,10 @@ module.exports = {
         if(!wishlist) {
             wishlist = await Wishlist.create({
                 ping: false,
-                UserId: user.id
+                UserId: user.id,
             });
-            interaction.channel.send("Created new wishlist");
+            wishlist.Characters = []
+            await interaction.channel.send("Created new wishlist");
         }
         switch (interaction.options.getSubcommand()) {
             case "view":
