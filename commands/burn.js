@@ -1,6 +1,6 @@
 const { SlashCommandBuilder, AttachmentBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
 const { Card, User, Group, Character } = require("../models");
-const { QUALITY_VALUES, QUALITY_NAMES, CURRENCY_SYMBOLS } = require("../config/constants");
+const { QUALITY_VALUES, QUALITY_NAMES, CURRENCY_SYMBOLS, PATREON } = require("../config/constants");
 const { UserUtils } = require("../util");
 const fs = require("fs");
 const edit = require("./edit");
@@ -40,6 +40,10 @@ module.exports = {
         }
         if (card.burned) {
             interaction.editReply({ content: "This card is already burned" });
+            return;
+        }
+        if (card.Character.Group.id == PATREON.customsGID) {
+            interaction.editReply({ content: "Custom cards can't be burned" });
             return;
         }
 

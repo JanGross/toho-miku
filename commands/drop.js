@@ -2,7 +2,7 @@ const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Compo
 const { Card, User, Character, DropHistory, Wishlist, sequelize } = require("../models");
 const { customAlphabet } = require("nanoid");
 const { CardUtils, UserUtils, ReplyUtils, GeneralUtils, Rendering } = require("../util");
-const { QUALITY } = require("../config/constants");
+const { QUALITY, PATREON } = require("../config/constants");
 const Sequelize = require('sequelize');
 const card = require("../models/card");
 
@@ -33,7 +33,8 @@ module.exports = {
         const cards = [];
         let characters = await Character.findAll({
             where: {
-                enabled: true
+                enabled: true,
+                groupId: { [Sequelize.Op.not] : PATREON.customsGID }
             },
             order: sequelize.random(),
             limit: 3

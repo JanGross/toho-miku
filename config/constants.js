@@ -70,6 +70,7 @@ const DAILY_REWARDS = {
 
 const PATREON = {
     roleServer : '441300798819794944',
+    customsGID : 4,
     tiers : {
         1 : {
             modifiers: {
