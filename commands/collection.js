@@ -97,6 +97,15 @@ module.exports = {
 
     },
 
+    /**
+     * A function to generate pagination components with optional features.
+     *
+     * @param {string} uid - The unique (component)ID for the pagination.
+     * @param {boolean} [prev=true] - Whether the "Previous" button should be enabled or disabled. Defaults to true.
+     * @param {boolean} [next=true] - Whether the "Next" button should be enabled or disabled. Defaults to true.
+     * @param {boolean} [groupDupes=false] - Whether the "Group Dupes" button should be checked or unchecked. Defaults to false (unchecked).
+     * @returns {ActionRowBuilder} An ActionRowBuilder object containing three ButtonBuilder objects for "Previous", "Next", and "Group Dupes" buttons. .
+     */
     getPaginateComponents(uid, prev=true, next=true, groupDupes=false) {
         //add buttons for pagination
         let row = new ActionRowBuilder();
@@ -122,6 +131,19 @@ module.exports = {
         return row;
     },
 
+    /**
+     * Updates the page embed of a user's card collection with pagination and filtering.
+     * This method has the side-effect of actively updating the passed embed!
+     *
+     * @function updatePageEmbed
+     * @param {string} uid - The unique (component)ID of the embed components.
+     * @param {Object} i - The embed message object.
+     * @param {Object} user - The user object (discord snowflake).
+     * @param {number} offset - The offset to start pagination.
+     * @param {boolean} group - True if cards should be grouped by character, false otherwise.
+     * @param {Object} filterParam - An object containing filters (character, group, and quality) to apply.
+     * @returns {Promise<void>} A promise that resolves when the embed is updated.
+     */
     async updatePageEmbed(uid, i, user, offset, group, filterParam) {
         let cards;
         let filter = {
@@ -136,6 +158,7 @@ module.exports = {
             offset: offset
         }
         
+        //The parameter "group" refers to character grouping and is unrelated to the entity of type group!!
         if (group)  {
             filter["attributes"] = ["characterId", [Card.sequelize.fn("COUNT", "characterId"), "count"]];
             filter["order"] = [[Card.sequelize.literal("count"), "DESC"]];

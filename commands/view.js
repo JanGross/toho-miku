@@ -50,6 +50,12 @@ module.exports = {
         }
     },
 
+    /**
+     * View a card by its identifier and create an embed for it
+     * @param {Interaction} interaction - The interaction object that triggered this function
+     * @param {string} cardIdentifier - The identifier of the card to view
+     * @returns {Promise<void>} - A promise that resolves once the card has been viewed and an embed has been created
+     */
     async viewCard(interaction, cardIdentifier) {
         let card = await Card.findOne({
             where: {
@@ -105,6 +111,15 @@ module.exports = {
         const message = await interaction.editReply({ embeds: [embed], files: [cardImage], fetchReply: true });
     },
 
+    /**
+     * View a character by its ID and create an embed for it.
+     * If the member who triggered the interaction is an admin, also include an "Edit" button.
+     * (Edits the passed interaction reply)
+     * 
+     * @param {Interaction} interaction - The interaction object that triggered this function.
+     * @param {number} characterId - The ID of the character to view.
+     * @returns {Promise<void>} - A promise that resolves once the character has been viewed and an embed has been created.
+     */
     async viewCharacter(interaction, characterId) {
         let isAdmin = await UserUtils.getPermissionLevel(interaction.member) == 2;
         let character = await Character.findOne({ 
@@ -161,6 +176,8 @@ module.exports = {
                 );
         }
         let replyPayload = { embeds: [embed], files: [imagePath], fetchReply: true }
+
+        //the experimental Edit button is added if view is invoked by an admin
         if  (isAdmin) { replyPayload.components = [row]; }
         const message = await interaction.editReply(replyPayload);
         const filter = (m) => m.member.user.id === interaction.member.user.id;
@@ -174,6 +191,15 @@ module.exports = {
         });
     },
 
+    /**
+     * View a badge by its ID and create an embed for it
+     * (Edits the passed interaction reply)
+     * 
+     * @async
+     * @param {Interaction} interaction - The interaction object that triggered this function
+     * @param {number} badgeId - The ID of the badge to view
+     * @returns {Promise<void>} - A promise that resolves once the badge has been viewed and an embed has been created
+     */
     async viewBadge(interaction, badgeId) {
         let badge = await Badge.findOne({ 
             where: { id: badgeId },
