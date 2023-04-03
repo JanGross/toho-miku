@@ -162,7 +162,7 @@ module.exports = {
         if (group)  {
             filter["attributes"] = ["characterId", [Card.sequelize.fn("COUNT", "characterId"), "count"]];
             filter["order"] = [[Card.sequelize.literal("count"), "DESC"]];
-            filter["group"] = ["characterId"];
+            filter["group"] = ["characterId"]; //Group based on characterID
         }
 
         if (filterParam["character"]) {
