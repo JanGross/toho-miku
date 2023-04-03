@@ -62,6 +62,10 @@ const QUALITY_VALUES = {
     }
 }
 
+const BASE_VALUES = {
+    wishlist_slots : 5
+}
+
 const DAILY_REWARDS = {
     primary_currency : 250,
     secondary_currency : 5,
@@ -126,5 +130,6 @@ exports.CURRENCY_SYMBOLS = CURRENCY_SYMBOLS;
 exports.QUALITY_SYMBOLS = QUALITY_SYMBOLS;
 exports.CURRENCY_NAMES = CURRENCY_NAMES;
 exports.QUALITY_VALUES = QUALITY_VALUES;
+exports.BASE_VALUES = BASE_VALUES;
 exports.DAILY_REWARDS = DAILY_REWARDS;
 exports.PATREON = PATREON;

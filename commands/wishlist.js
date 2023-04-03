@@ -1,6 +1,7 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, IntegrationApplication } = require("discord.js");
 const { Wishlist, Character } = require("../models");
 const UserUtils = require("../util/users");
+const { BASE_VALUES } = require("../config/constants");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -48,9 +49,13 @@ module.exports = {
             wishlist.Characters = []
             await interaction.channel.send("Created new wishlist");
         }
+        
+        let patreonSlots = (await UserUtils.getPatreonPerks(interaction.client, user))['perks']?.['modifiers']['wishlist'] || 0;
+        let slotasAvailable = BASE_VALUES.wishlist_slots + patreonSlots;
+
         switch (interaction.options.getSubcommand()) {
             case "view":
-                let reply = `Wishlist entries (${wishlist.Characters.length}/5 used):\n`;
+                let reply = `Wishlist entries (${wishlist.Characters.length}/${slotasAvailable} used):\n`;
                 wishlist.Characters.forEach(character => {
                     reply += `${character.name} \n`;
                 });
@@ -65,13 +70,13 @@ module.exports = {
 
                 if (await wishlist.hasCharacter(character)) {
                     await wishlist.removeCharacter(character)
-                    await interaction.editReply(`Removed ${character.name} from your wishlist! ${wishlist.Characters.length-1}/5 used`);
+                    await interaction.editReply(`Removed ${character.name} from your wishlist! ${wishlist.Characters.length-1}/${slotasAvailable} used`);
                 } else {
                     if (wishlist.Characters.length < 5) {
                         await wishlist.addCharacter(character);
-                        await interaction.editReply(`Added ${character.name} to your wishlist! ${wishlist.Characters.length+1}/5 used`);
+                        await interaction.editReply(`Added ${character.name} to your wishlist! ${wishlist.Characters.length+1}/${slotasAvailable} used`);
                     } else {
-                        await interaction.editReply(`You have no remaining wishlist slots! ${wishlist.Characters.length}`);
+                        await interaction.editReply(`You have no remaining wishlist slots! ${wishlist.Characters.length}/${slotasAvailable} used`);
                     }
                 }
                 break;
