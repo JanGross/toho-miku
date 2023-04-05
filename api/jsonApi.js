@@ -60,7 +60,10 @@ router.get('/most-recent-drop', async (req, res) => {
 
   try {
     const mostRecentDrop = await DropHistory.findOne({
-      order: [['createdAt', 'DESC']]
+      order: [['createdAt', 'DESC']],
+      where: {
+        type: 0
+      }
     });
 
     if (!mostRecentDrop) {
