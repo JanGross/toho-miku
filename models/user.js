@@ -107,7 +107,10 @@ module.exports = (sequelize, DataTypes) => {
     remainingClaims: DataTypes.INTEGER,
     nextDropReset: DataTypes.DATE,
     nextClaimReset: DataTypes.DATE,
-    nextDaily: DataTypes.DATE
+    nextDaily: DataTypes.DATE,
+    wishlistPing: DataTypes.BOOLEAN,
+    dropPing: DataTypes.BOOLEAN,
+    dailyPing: DataTypes.BOOLEAN
   }, {
     hooks: {
       afterCreate: async (user, options) => {
