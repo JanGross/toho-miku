@@ -2,6 +2,7 @@ require("dotenv").config();
 const { Console } = require("console");
 const fs = require("fs");
 const {Client, GatewayIntentBits, Collection} = require("discord.js");
+const webApi = require('./api/jsonApi');
 const dbUtil = require("./util/db")
 
 const logger = new Console({
@@ -44,6 +45,11 @@ logger.log("Syncing database...");
 dbUtil.syncDb();
 client.login(process.env.TOKEN);
 
+webApi.client = client;
+const PORT = process.env.API_PORT;
+webApi.listen(PORT, () => {
+  console.log(`HTTP API listening on port ${PORT}`);
+});
 
 
 
