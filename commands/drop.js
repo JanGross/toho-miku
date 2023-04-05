@@ -191,12 +191,12 @@ module.exports = {
                 });
                 let reply = await i.reply({ content: `${i.user} (${claimUser.id}) claimed a card!  [${cards[cardId].identifier}]`, ephemeral: false, fetchReply: true  });
                 collectionReplies.push({ ref: reply, characterName: character.name, card: cards[cardId] });
-                let newRow = ReplyUtils.recreateComponents(i.message.components);
-                newRow.components[cardId].setLabel("Claimed");
-                newRow.components[cardId].setStyle(ButtonStyle.Success);
-                newRow.components[cardId].setDisabled(true);
+                let newComponents = ReplyUtils.recreateComponents(i.message.components);
+                newComponents[0].components[cardId].setLabel("Claimed");
+                newComponents[0].components[cardId].setStyle(ButtonStyle.Success);
+                newComponents[0].components[cardId].setDisabled(true);
                 //let deckImage = await Rendering.renderCardStack(cards);
-                message.edit({ components: [newRow] });
+                message.edit({ components: newComponents });
             }
         });
         
