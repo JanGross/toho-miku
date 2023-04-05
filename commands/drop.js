@@ -109,17 +109,18 @@ module.exports = {
                 },
                 {
                     model: User,
-                    attributes: ['discordId']
+                    attributes: ['discordId', 'wishlistPing']
                 }]
             });
+            wishlists = wishlists.filter(wishlist => wishlist.User.wishlistPing);
             wishlists.forEach(wishlist => {
-                if(guildMembers.includes(wishlist.User.discordId)) {
+                if(wishlist.User.wishlistPing && guildMembers.includes(wishlist.User.discordId)) {
                     pings.push(`<@${wishlist.User.discordId}>`);
                 }
             });
             if (wishlists.length > 0) {
-                let debug = wishlists[0];
-                pings.push(`your wishlisted character ${debug.Characters[0].name} is in this drop!\n`);
+                let character = wishlists[0].Characters[0];
+                pings.push(`your wishlisted character ${character.name} is in this drop!\n`);
             }
         }
         //add 10 experience to the user
