@@ -28,7 +28,7 @@ router.get('/characters', async (req, res) => {
 router.get('/characters/:character_id', async (req, res) => {
     let character = await Character.findByPk(req.params.character_id);
 
-    if (!character.enabled && !isAuthorized(req)) {
+    if (!character || !character.enabled && !isAuthorized(req)) {
         res.status(404).json({ error: 'Character not found' });
         return;
     }

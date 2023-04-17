@@ -28,7 +28,7 @@ router.get('/groups', async (req, res) => {
 router.get('/groups/:group_id', async (req, res) => {
     let group = await Group.findByPk(req.params.group_id);
 
-    if (!group.enabled && !isAuthorized(req)) {
+    if (!group || !group.enabled && !isAuthorized(req)) {
         res.status(404).json({ error: 'Group not found' });
         return;
     }
