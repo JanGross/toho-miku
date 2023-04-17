@@ -36,6 +36,7 @@ router.get('/characters/:character_id', async (req, res) => {
 });
 
 router.post('/characters', async (req, res) => {
+    if (!isAuthorized(req, res)) { return; }
     try {
         const newCharacterData = req.body;
 
