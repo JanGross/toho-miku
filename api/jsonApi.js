@@ -3,6 +3,7 @@ const Sequelize = require('sequelize');
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Card, User, DropHistory, Character, Group } = require("../models");
+const { isAuthorized } = require('./middleware/apiKeyAuth');
 const { Op } = require('sequelize');
 
 const ACCESS_TOKEN = process.env.API_ACCESS_TOKEN;
@@ -12,18 +13,6 @@ const router = express.Router();
 const PREFIX = '/api/v1';
 
 app.use(bodyParser.json());
-
-function isAuthorized(req, res=null) {
-  const providedToken = req.headers['apikey'];
-  if (providedToken !== ACCESS_TOKEN) {
-    if(res) {
-      res.status(401).json({ error: 'Unauthorized' });
-    }
-    return false;
-  }
-
-  return true;
-}
 
 router.get('/', (req, res) => {
   const routes = router.stack
