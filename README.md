@@ -1,4 +1,4 @@
-# Band Bot
+# Toho Miku
 
 ### Run dev container
 
@@ -13,6 +13,5 @@ $npx sequelize db:migrate
 $npx sequelize db:seed:all
 ``` 
 
-### Import
-
-Use `npm run import` to import from assets/import/{bands,characters}.
+### API  
+API docs can be found in [Docs/api/README.md](Docs/api/README.md)
