@@ -12,10 +12,12 @@ const PREFIX = '/api/v1';
 
 app.use(bodyParser.json());
 
-function isAuthorized(req, res) {
+function isAuthorized(req, res=null) {
   const providedToken = req.headers['apikey'];
   if (providedToken !== ACCESS_TOKEN) {
+    if(res) {
     res.status(401).json({ error: 'Unauthorized' });
+    }
     return false;
   }
 
