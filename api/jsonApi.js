@@ -7,6 +7,7 @@ const { isAuthorized } = require('./middleware/apiKeyAuth');
 const { Op } = require('sequelize');
 
 const groupRoutes = require('./routes/groups');
+const badgeRoutes = require('./routes/badges');
 const characterRoutes = require('./routes/characters');
 
 const ACCESS_TOKEN = process.env.API_ACCESS_TOKEN;
@@ -85,5 +86,6 @@ router.get('/most-recent-drop', async (req, res) => {
 
 app.use(PREFIX, router);
 app.use(PREFIX, groupRoutes);
+app.use(PREFIX, badgeRoutes);
 app.use(PREFIX, characterRoutes);
 module.exports = app;
