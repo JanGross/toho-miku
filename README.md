@@ -1,4 +1,5 @@
 # Toho Miku
+[![](https://dcbadge.vercel.app/api/server/uWFpsYnbPX)](https://discord.gg/uWFpsYnbPX)  [![Support the project on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dtoho_miku%26type%3Dpatrons&style=for-the-badge)](https://patreon.com/toho_miku)
 
 ### Run dev container
 
