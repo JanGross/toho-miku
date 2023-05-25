@@ -84,6 +84,11 @@ router.get('/most-recent-drop', async (req, res) => {
  }
 });
 
+//Fallback route - Has to be defined last!
+router.all('*', (req, res) => {
+  res.redirect(process.env.HOMEPAGE_URL);
+});
+
 app.use(PREFIX, router);
 app.use(PREFIX, groupRoutes);
 app.use(PREFIX, badgeRoutes);
