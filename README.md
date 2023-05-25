@@ -1,6 +1,11 @@
 # Toho Miku
 [![](https://dcbadge.vercel.app/api/server/uWFpsYnbPX)](https://discord.gg/uWFpsYnbPX)  [![Support the project on Patreon](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.vercel.app%2Fapi%3Fusername%3Dtoho_miku%26type%3Dpatrons&style=for-the-badge)](https://patreon.com/toho_miku)
 
+Part of this project are
+- [Toho-Mon](https://github.com/JanGross/toho-mon) Bot status monitoring with webhook alerts
+- [Toho-Reno](https://github.com/JanGross/toho-reno) Headless render node 
+- [Job-Server](https://github.com/JanGross/job-server) Jobserver managing render jobs
+
 ### Run dev container
 
 ```bash
