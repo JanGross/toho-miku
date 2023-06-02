@@ -71,8 +71,6 @@ module.exports = {
             return;
         }
         let cardImage = await Rendering.renderCard(card);
-        //get base filename
-        let filename = cardImage.split("/").pop();
 
         let description = "";
         //Add a new line after every 4th (long) word or after a full stop
@@ -92,7 +90,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setTitle(`${card.Character.name}`)
             .setDescription(description)
-            .setImage(`attachment://${filename}`)
+            .setImage(cardImage)
             .setThumbnail(card.Character.Group.imageURL)
             .addFields(
                 { name: "Owned by", value: `<@${card.User.discordId}>` },
@@ -108,7 +106,7 @@ module.exports = {
             embed.setColor(0xff0000);
             embed.addFields({ name: "Burned", value: "This card has been burned" });
         }
-        const message = await interaction.editReply({ embeds: [embed], files: [cardImage], fetchReply: true });
+        const message = await interaction.editReply({ embeds: [embed], fetchReply: true });
     },
 
     /**
