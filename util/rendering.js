@@ -2,6 +2,7 @@ const sharp = require('sharp');
 const crypto = require('crypto');
 const fs = require('fs');
 const { Character } = require('../models');
+const axios = require('axios').default
 
 const QualityColors = {
     1: {r: 0, g: 0, b: 0}, //bad
@@ -53,61 +54,60 @@ module.exports = {
             }
         });
 
-        if (!card.userId) {
+/*         if (!card.userId) {
             return './assets/cards/card_cover.png';
-        }
-
+        } */
+        /**
         let hash = crypto.createHash('md5').update(character.imageIdentifier + card.quality + (card.userId == 1 ? 'unclaimed' : 'claimed')).digest('hex');
         //TODO: Add switch to turn off or bypass caching
         if (fs.existsSync(`./assets/image_cache/${hash}.gif`)) {
             return `./assets/image_cache/${hash}.gif`;
         }
-
-        console.log(`Rendering card ${hash} for character ${character.name} ${character.imageIdentifier}`);
+        **/
+        console.log(`Rendering card or character ${character.name} ${character.imageIdentifier}`);
         
-        let filetype = character.imageIdentifier.split('.').pop();
-        let isAnimated = ['gif', 'webp'].includes(filetype);
-
-        let border = await sharp(`./assets/overlays/border.svg`).tint(QualityColors[card.quality]).toBuffer();
-        //BUGBUG: Custom fonts not loading
-        let label = Buffer.from(`
-        <svg width="300" height="500">
-            <text x="50%" y="95%" text-anchor="middle" style="font-size:28px;">${character.name}</text>
-        </svg>
-        `);
-
-        let cardImage;
-        try {
-            console.log("Loading character image");
-            cardImage = await sharp(`./assets/cards/${character.imageIdentifier}`, 
-                                    { animated: isAnimated, pages: (isAnimated ? -1 : 1) });
-            await cardImage.toBuffer();
-        } catch (error) {
-            console.log(`Missing character image: ${character.imageIdentifier}`);
-            cardImage = await sharp(`./assets/cards/missing_image.png`);
+        let characterImage = `http://vps5.minzkraut.com:6789/cards/${character.imageIdentifier}`;
+        console.log("Character iomage ", characterImage);
+        let job = {
+            "type": "card",
+            "size": {
+                "width": 600,
+                "height": 1000
+            },
+            "elements": [
+                { 
+                    "type": "image",
+                    "asset": `${characterImage}`,
+                    "x": 0,
+                    "y": 300,
+                    "width": 600,
+                    "height": 1000
+                },
+                {
+                    "type": "text",
+                    "text": `${character.name}`,
+                    "fontSize": 55,
+                    "x": 0,
+                    "y": 700,
+                    "width": 600,
+                    "height": 300,
+                    "horizontalAlignment": "center"
+                },
+                { 
+                    "type": "image",
+                    "asset": "https://cdn.discordapp.com/attachments/1083687175998152714/1113486254953222205/rainbow_overlay.png",
+                    "x": 0,
+                    "y": 300,
+                    "width": 600,
+                    "height": 1000
+                }
+            ]
         }
-        console.log("rendering");
-        await cardImage.resize(300, 500);
-        await cardImage.composite([
-            {input: border, top:0, left: 0, tile: true},
-            {input: label, top:0, left: 0, tile: true}]);
-        //BUGBUG: Grayscale does not apply to card border
-        if (card.userId === 1) {
-            await cardImage.grayscale()
-            .modulate({
-                brightness: 0.5
-            });
-        }
+        
+        console.log("Fetching ", );
+        let { data } = await axios.post('https://jose.toho.mnz.gg/jobs', job);
+        console.log("Fetched ", data);
+        return data["path"];
 
-        if (isAnimated) {
-            await cardImage.gif({effort: 1})
-        } else {
-            await cardImage.png();
-        }
-
-        let extension = isAnimated ? 'gif' : 'png';
-        await cardImage.toFile(`./assets/image_cache/${hash}.${extension}`);
-
-        return `./assets/image_cache/${hash}.${extension}`;
     }
 }
