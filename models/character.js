@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       Character.belongsTo(models.Group, { foreignKey: 'groupId', });
       // A character can belong to many badges
       Character.belongsToMany(models.Badge, { through: 'BadgeCharacter' });
+      Character.hasMany(models.Card, { foreignKey: 'characterId' });
     }
   }
   Character.init({
