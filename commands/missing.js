@@ -13,7 +13,7 @@ module.exports = {
         .setDescription("View missing things")
         .addStringOption((option) =>
             option
-                .setName("group_id")
+                .setName("group")
                 .setDescription("Thing identifier")
                 .setRequired(false)
                 .setAutocomplete(true)
@@ -22,22 +22,36 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
 
-        let groupId = interaction.options.getString("group_id");
+        let groupId = interaction.options.getString("group");
         let user = await UserUtils.getUserByDiscordId(interaction.member.user.id);
+
+        let embed = new EmbedBuilder()
+            .setTitle(`Missing cards`);
+        let description = "";
 
         if (groupId) {
             try {
-                let missingCards = await this.FindMissingFromGroup(user.id, groupId);
-                await interaction.editReply(JSON.stringify(missingCards));
-                return;
+                let missing = await this.FindMissingFromGroup(user.id, groupId);
+                missing.map((character) => {
+                    description += `[${character.id}] ${character.name}\n`;
+                });
             } catch (error) {
                 console.error('Error:', error);
                 throw error;
             }
+            
+        } else {
+            let missingCounts = await this.CountMissingFromGroup(user.id);
+            missingCounts.sort(({missingCount:a}, {missingCount:b}) => b-a);
+            missingCounts.map((group) => { 
+                if (group.missingCount > 0) {
+                    description += `${group.name}: ${group.missingCount}\n`;
+                }
+            });
         }
 
-        let missingCount = await this.CountMissingFromGroup(user.id);
-        await interaction.editReply(JSON.stringify(missingCount));
+        embed.setDescription(description);
+        await interaction.editReply({ embeds: [embed] });
         return;
     },
     async CountMissingFromGroup(userId) {
@@ -64,8 +78,8 @@ module.exports = {
                     }, 0);
 
                     return {
-                        groupId: group.id,
-                        groupName: group.name,
+                        id: group.id,
+                        name: group.name,
                         missingCount: missingCount,
                     };
                 })
