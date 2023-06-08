@@ -84,6 +84,13 @@ module.exports = {
         console.log(`Rendering card or character ${character.name} ${character.imageIdentifier}`);
         
         let characterImage = `${process.env.ASSET_URL}/cards/${character.imageIdentifier}`;
+
+        //Hide character info if the card is unclaimed
+        if (!card.userId) {
+            characterImage = `${process.env.ASSET_URL}/cards/card_cover.png`;
+            character.name = ' ';
+        }
+
         console.log("Character iomage ", characterImage);
         let job = {
             "type": "card",
@@ -109,21 +116,13 @@ module.exports = {
                     "width": 600,
                     "height": 300,
                     "horizontalAlignment": "center"
-                },
-                { 
-                    "type": "image",
-                    "asset": "https://cdn.discordapp.com/attachments/1083687175998152714/1113486254953222205/rainbow_overlay.png",
-                    "x": 0,
-                    "y": 0,
-                    "width": 600,
-                    "height": 1000
                 }
             ]
         }
         
         console.log("Fetching ", );
         let { data } = await axios.post(`${process.env.JOSE_ENDPOINT}/jobs`, job);
-        console.log("Fetched ", data);
+        console.log("Fetched ", data["path"]);
         return data["path"];
 
     }
