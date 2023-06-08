@@ -19,33 +19,49 @@ module.exports = {
     name: "Rendering",
     renderCardStack: async function(cards) {
 
-        for (let card of cards) {
+        await Promise.all(cards.map(async card => {
             console.log(`Iterating card ${card.id}`);
             card['render'] = await this.renderCard(card);
+        }));
+        
+        let job = {
+            "type": "stack",
+            "size": {
+                "width": 900,
+                "height": 500
+            },
+            "elements": [
+                { 
+                    "type": "image",
+                    "asset": `${cards[0].render}`,
+                    "x": 0,
+                    "y": 0,
+                    "width": 300,
+                    "height": 500
+                },
+                { 
+                    "type": "image",
+                    "asset": `${cards[1].render}`,
+                    "x": 300,
+                    "y": 0,
+                    "width": 300,
+                    "height": 500
+                },
+                { 
+                    "type": "image",
+                    "asset": `${cards[2].render}`,
+                    "x": 600,
+                    "y": 0,
+                    "width": 300,
+                    "height": 500
+                }
+            ]
         }
         
-        let image = await sharp({
-            create: {
-                width: 900,
-                height: 500,
-                channels: 4,
-                background: { r: 0, g: 0, b: 0, alpha: 0.0 },
-                animated: true
-            }
-         }).composite([
-            { input: cards[0].render, gravity: 'northwest' },
-            { input: cards[1].render, gravity: 'centre' },
-            { input: cards[2].render, gravity: 'northeast' },
-        ]); 
-
-        let hash = crypto.createHash('md5').update("CHANGEME").digest('hex');
-        try {
-            await image.gif({effort: 1}).toFile(`./assets/image_cache/${hash}.gif`);            
-        } catch (error) {
-            console.log(error);
-        }
-
-        return `./assets/image_cache/${hash}.gif`;
+        console.log("Fetching ", );
+        let { data } = await axios.post(`${process.env.JOSE_ENDPOINT}/jobs`, job);
+        console.log("Fetched ", data);
+        return data["path"];
 
     },
     renderCard: async function(card) {
@@ -80,7 +96,7 @@ module.exports = {
                     "type": "image",
                     "asset": `${characterImage}`,
                     "x": 0,
-                    "y": 300,
+                    "y": 0,
                     "width": 600,
                     "height": 1000
                 },
@@ -98,7 +114,7 @@ module.exports = {
                     "type": "image",
                     "asset": "https://cdn.discordapp.com/attachments/1083687175998152714/1113486254953222205/rainbow_overlay.png",
                     "x": 0,
-                    "y": 300,
+                    "y": 0,
                     "width": 600,
                     "height": 1000
                 }
