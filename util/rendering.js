@@ -67,7 +67,7 @@ module.exports = {
         **/
         console.log(`Rendering card or character ${character.name} ${character.imageIdentifier}`);
         
-        let characterImage = `http://vps5.minzkraut.com:6789/cards/${character.imageIdentifier}`;
+        let characterImage = `${process.env.ASSET_URL}/cards/${character.imageIdentifier}`;
         console.log("Character iomage ", characterImage);
         let job = {
             "type": "card",
