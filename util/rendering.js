@@ -1,3 +1,4 @@
+require("dotenv").config();
 const sharp = require('sharp');
 const crypto = require('crypto');
 const fs = require('fs');
@@ -105,7 +106,7 @@ module.exports = {
         }
         
         console.log("Fetching ", );
-        let { data } = await axios.post('https://jose.toho.mnz.gg/jobs', job);
+        let { data } = await axios.post(`${process.env.JOSE_ENDPOINT}/jobs`, job);
         console.log("Fetched ", data);
         return data["path"];
 
