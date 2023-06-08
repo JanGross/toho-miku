@@ -93,4 +93,6 @@ app.use(PREFIX, router);
 app.use(PREFIX, groupRoutes);
 app.use(PREFIX, badgeRoutes);
 app.use(PREFIX, characterRoutes);
+app.use('/assets', express.static('assets'));
+
 module.exports = app;
