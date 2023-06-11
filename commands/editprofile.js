@@ -55,7 +55,6 @@ module.exports = {
         const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 25000 })
 
         collector.on('collect', async (i) => {
-            await i.deferReply();
             switch (i.customId) {
                 case 'editStatus':
                     await this.openStatusModal(i, user, profile);
