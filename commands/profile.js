@@ -30,7 +30,6 @@ module.exports = {
         let profile = await user.getProfile();
 
         let customStatus = this.encodeStr(profile.customStatus);
-        customStatus = customStatus.replace(/(.{0,40}[\s])/g, '<tspan x="443" dy="1.2em">$1</tspan>');
           
         let profileTemplate = fs.readFileSync('/app/assets/profile/profile.svg').toString();
         profileTemplate = profileTemplate.replace(/{{USERNAME}}/g, this.encodeStr(discordUser.username.substr(0,15)+(discordUser.username.length>15?'...':'')));
@@ -41,15 +40,7 @@ module.exports = {
         profileTemplate = profileTemplate.replace(/{{CUR_1}}/g, `${await user.primaryCurrency} ${CURRENCY_NAMES[1]}`);
         profileTemplate = profileTemplate.replace(/{{CUR_2}}/g, `${await user.secondaryCurrency} ${CURRENCY_NAMES[2]}`);
 
-        let userImageBuffer = await axios.get(discordUser.displayAvatarURL({format: 'png', size: 128}), { responseType: 'arraybuffer' });
-        userImage = await sharp(userImageBuffer.data);
-        const rect = new Buffer.from(
-            '<svg><rect x="0" y="0" width="128" height="128" rx="100%" ry="100%"/></svg>'
-        );
-        userImage = await userImage.composite([{input: rect, blend: 'dest-in' }]).png().toBuffer();
-
-        let background = await sharp(Buffer.from(profileTemplate, 'utf8'))
-            .composite([{ input: userImage, left: 360, top: 20 }]).png().toBuffer();
+        let userImage = discordUser.displayAvatarURL({format: 'png', size: 128}).split('webp')[0] + 'png';
 
         let slots = ['slotOne', 'slotTwo', 'slotThree', 'slotFour'];
         let renderedCards = [];
@@ -83,7 +74,7 @@ module.exports = {
                     "type": "image",
                     "asset": `${renderedCards[1]}`,
                     "x": 350,
-                    "y": 300,
+                    "y": 325,
                     "width": 150,
                     "height": 250
                 },
@@ -91,7 +82,7 @@ module.exports = {
                     "type": "image",
                     "asset": `${renderedCards[2]}`,
                     "x": 510,
-                    "y": 300,
+                    "y": 325,
                     "width": 150,
                     "height": 250
                 },
@@ -99,9 +90,17 @@ module.exports = {
                     "type": "image",
                     "asset": `${renderedCards[3]}`,
                     "x": 670,
-                    "y": 300,
+                    "y": 325,
                     "width": 150,
                     "height": 250
+                },
+                { 
+                    "type": "image",
+                    "asset": userImage,
+                    "x": 350,
+                    "y": 50,
+                    "width": 150,
+                    "height": 150
                 },
                 {
                     "type": "text",
@@ -112,6 +111,16 @@ module.exports = {
                     "width": 300,
                     "height": 30,
                     "horizontalAlignment": "center"
+                },
+                {
+                    "type": "text",
+                    "text": customStatus,
+                    "fontSize": 30,
+                    "x": 550,
+                    "y": 25,
+                    "width": 600,
+                    "height": 300,
+                    "horizontalAlignment": "left"
                 }
             ]
         }
