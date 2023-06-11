@@ -1,3 +1,4 @@
+require("dotenv").config();
 const { SlashCommandBuilder, MessageAttachment, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { Card, User, Character } = require("../models");
 const { UserUtils, Compositing, Rendering } = require("../util");
@@ -52,19 +53,73 @@ module.exports = {
 
         let slots = ['slotOne', 'slotTwo', 'slotThree', 'slotFour'];
         let renderedCards = [];
-        for (slot of slots) {
+        await Promise.all(slots.map(async slot => {
             let card = await Card.findOne({ where: { id: profile[slot], burned: false } });
             if (card) {
+                console.log(`Iterating card ${card.id}`);
                 let cardImage = await Rendering.renderCard(card);
                 renderedCards.push(cardImage);
             } else {
-                renderedCards.push('/app/assets/cards/missing_image.png');
+                renderedCards.push(`${process.env.ASSET_URL}/cards/card_cover.png`);
             }
+        }));
 
+        let job = {
+            "type": "profile",
+            "size": {
+                "width": 1200,
+                "height": 600
+            },
+            "elements": [
+                { 
+                    "type": "image",
+                    "asset": `${renderedCards[0]}`,
+                    "x": 25,
+                    "y": 85,
+                    "width": 300,
+                    "height": 500
+                },
+                { 
+                    "type": "image",
+                    "asset": `${renderedCards[1]}`,
+                    "x": 350,
+                    "y": 300,
+                    "width": 150,
+                    "height": 250
+                },
+                { 
+                    "type": "image",
+                    "asset": `${renderedCards[2]}`,
+                    "x": 510,
+                    "y": 300,
+                    "width": 150,
+                    "height": 250
+                },
+                { 
+                    "type": "image",
+                    "asset": `${renderedCards[3]}`,
+                    "x": 670,
+                    "y": 300,
+                    "width": 150,
+                    "height": 250
+                },
+                {
+                    "type": "text",
+                    "text": this.encodeStr(discordUser.username.substr(0,15)+(discordUser.username.length>15?'...':'')),
+                    "fontSize": 30,
+                    "x": 25,
+                    "y": 25,
+                    "width": 300,
+                    "height": 30,
+                    "horizontalAlignment": "center"
+                }
+            ]
         }
-
-        let profileImage = await Compositing.renderProfile(profile, background, renderedCards);
-        await interaction.editReply({ files: [profileImage] });
+        
+        console.log("Fetching ", );
+        let { data } = await axios.post(`${process.env.JOSE_ENDPOINT}/jobs`, job);
+        console.log("Fetched ", data);
+        await interaction.editReply({ files: [data["path"]] });
     },
     encodeStr: function(str) {
         let charMapping = {
