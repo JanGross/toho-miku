@@ -5,7 +5,7 @@
 Part of this project are
 - [Toho-Mon](https://github.com/JanGross/toho-mon) Bot status monitoring with webhook alerts
 - [Toho-Reno](https://github.com/JanGross/toho-reno) Godot render node 
-- [Job-Server](https://github.com/JanGross/job-server) Jobserver managing render jobs
+- [Toho-Jose](https://github.com/JanGross/toho-jose) Jobserver managing render jobs
 
 ### Run dev container
 
