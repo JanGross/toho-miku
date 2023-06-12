@@ -120,7 +120,7 @@ module.exports = {
                     "text": `${character.name}`,
                     "fontSize": 55,
                     "x": 0,
-                    "y": 700,
+                    "y": 850,
                     "width": 600,
                     "height": 300,
                     "horizontalAlignment": "center"
