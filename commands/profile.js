@@ -73,26 +73,26 @@ module.exports = {
                 { 
                     "type": "image",
                     "asset": `${renderedCards[1]}`,
-                    "x": 350,
-                    "y": 325,
-                    "width": 150,
-                    "height": 250
+                    "x": 375,
+                    "y": 310,
+                    "width": 175,
+                    "height": 275
                 },
                 { 
                     "type": "image",
                     "asset": `${renderedCards[2]}`,
-                    "x": 510,
-                    "y": 325,
-                    "width": 150,
-                    "height": 250
+                    "x": 560,
+                    "y": 310,
+                    "width": 175,
+                    "height": 275
                 },
                 { 
                     "type": "image",
                     "asset": `${renderedCards[3]}`,
-                    "x": 670,
-                    "y": 325,
-                    "width": 150,
-                    "height": 250
+                    "x": 745,
+                    "y": 310,
+                    "width": 175,
+                    "height": 275
                 },
                 { 
                     "type": "image",
