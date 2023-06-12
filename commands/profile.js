@@ -105,9 +105,9 @@ module.exports = {
                 {
                     "type": "text",
                     "text": this.encodeStr(discordUser.username.substr(0,15)+(discordUser.username.length>15?'...':'')),
-                    "fontSize": 30,
+                    "fontSize": 32,
                     "x": 25,
-                    "y": 25,
+                    "y": 20,
                     "width": 300,
                     "height": 30,
                     "horizontalAlignment": "center"
@@ -157,7 +157,7 @@ module.exports = {
                     "text": customStatus,
                     "fontSize": 30,
                     "x": 550,
-                    "y": 30,
+                    "y": 55,
                     "width": 600,
                     "height": 300,
                     "horizontalAlignment": "left"
