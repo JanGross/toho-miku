@@ -102,6 +102,14 @@ module.exports = {
                 { 
                     "type": "image",
                     "asset": `${characterImage}`,
+                    "x": 10,
+                    "y": 10,
+                    "width": 580,
+                    "height": 980
+                },
+                { 
+                    "type": "image",
+                    "asset": `${process.env.ASSET_URL}/overlays/default_frame.png`,
                     "x": 0,
                     "y": 0,
                     "width": 600,
