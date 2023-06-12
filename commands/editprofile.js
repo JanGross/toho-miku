@@ -51,8 +51,8 @@ module.exports = {
         let message = await interaction.editReply({ content: "", components: [mainRow, pingRow], fetchReply: true });
 
         //filter only events from the user who triggered the command
-        const filter = (m) => m.author.id === interaction.author.id;
-        const collector = message.createMessageComponentCollector({ componentType: ComponentType.Button, time: 25000 })
+        const filter = (m) => m.user.id === interaction.user.id;
+        const collector = message.createMessageComponentCollector({ filter: filter, componentType: ComponentType.Button, time: 300000 })
 
         collector.on('collect', async (i) => {
             switch (i.customId) {
@@ -63,18 +63,22 @@ module.exports = {
                     await this.openShowcaseModal(i, user, profile);
                     break;
                 case 'toggle-wishlist-ping':
+                    await i.deferUpdate();
                     user.wishlistPing = !user.wishlistPing;
                     user.save();
                     break;
                 case 'toggle-drop-ping':
+                    await i.deferUpdate();
                     user.dropPing = !user.dropPing;
                     user.save();
                     break;
                 case 'toggle-daily-ping':
+                    await i.deferUpdate();
                     user.dailyPing = !user.dailyPing;
                     user.save();
                     break;
                 default:
+                    await i.deferReply();
                     i.editReply({ content: "Invalid selection" });
                     return;
                     break;
@@ -88,8 +92,6 @@ module.exports = {
                 }
             });
             await message.edit({ components: newComponents });
-            let msg = await i.editReply({content: '...'});
-            await msg.delete();
         });
     },
     async openShowcaseModal(interaction, user, profile) {
@@ -117,13 +119,12 @@ module.exports = {
 
         let submitted = await interaction.awaitModalSubmit({
             time: 60000,
-            filter: i => i.user.id === interaction.user.id,
+            filter: i => i.user.id === interaction.user.id && i.customId === 'cardSlotModal',
           }).catch(error => {
             //Error includes timeout
             console.error(error)
             return null
           })
-          
           if (submitted) {
             let updatePayload = {};
             for (slot of slots) {
@@ -143,7 +144,7 @@ module.exports = {
     },
     async openStatusModal(interaction, user, profile) {
         const modal = new ModalBuilder()
-            .setCustomId('descriptionModal')
+            .setCustomId('statusModal')
             .setTitle('Edit profile status/description');
 
         let row = new ActionRowBuilder();
@@ -161,7 +162,7 @@ module.exports = {
 
         let submitted = await interaction.awaitModalSubmit({
             time: 300000,
-            filter: i => i.user.id === interaction.user.id,
+            filter: i => i.user.id === interaction.user.id && i.customId === 'statusModal',
           }).catch(error => {
             //Error includes timeout
             console.error(error)
