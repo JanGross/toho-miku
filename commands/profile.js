@@ -114,10 +114,50 @@ module.exports = {
                 },
                 {
                     "type": "text",
+                    "text": `CC: ${await Card.count({where: {userId: user.id}})}`,
+                    "fontSize": 30,
+                    "x": 550,
+                    "y": 20,
+                    "width": 150,
+                    "height": 30,
+                    "horizontalAlignment": "left"
+                },
+                {
+                    "type": "text",
+                    "text": `LVL: ${await user.level().currentLevel}`,
+                    "fontSize": 30,
+                    "x": 700,
+                    "y": 20,
+                    "width": 150,
+                    "height": 30,
+                    "horizontalAlignment": "left"
+                },
+                {
+                    "type": "text",
+                    "text": `${await user.primaryCurrency} ${CURRENCY_NAMES[1]}`,
+                    "fontSize": 30,
+                    "x": 850,
+                    "y": 20,
+                    "width": 150,
+                    "height": 30,
+                    "horizontalAlignment": "left"
+                },
+                {
+                    "type": "text",
+                    "text": `${await user.secondaryCurrency} ${CURRENCY_NAMES[2]}`,
+                    "fontSize": 30,
+                    "x": 1000,
+                    "y": 20,
+                    "width": 150,
+                    "height": 30,
+                    "horizontalAlignment": "left"
+                },
+                {
+                    "type": "text",
                     "text": customStatus,
                     "fontSize": 30,
                     "x": 550,
-                    "y": 25,
+                    "y": 30,
                     "width": 600,
                     "height": 300,
                     "horizontalAlignment": "left"
