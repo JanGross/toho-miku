@@ -2,7 +2,7 @@ version: "3.7"
 
 services:
   bot:
-    image: node:16.9.0-alpine
+    image: node:20-alpine
     command: sh -c "npm config set cache /app/.npm_cache --global && npm install && npx sequelize db:migrate && node ."
     restart: unless-stopped
     environment:
