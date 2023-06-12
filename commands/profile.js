@@ -1,11 +1,9 @@
 require("dotenv").config();
-const { SlashCommandBuilder, MessageAttachment, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const { Card, User, Character } = require("../models");
-const { UserUtils, Compositing, Rendering } = require("../util");
+const { SlashCommandBuilder } = require("discord.js");
+const { Card } = require("../models");
+const { UserUtils, Rendering } = require("../util");
 const axios = require("axios");
-const sharp = require("sharp");
 const { CURRENCY_NAMES } = require("../config/constants");
-const fs = require('fs');
 
 const pageSize = 8;
 
@@ -29,17 +27,8 @@ module.exports = {
 
         let profile = await user.getProfile();
 
-        let customStatus = this.encodeStr(profile.customStatus);
+        let customStatus = profile.customStatus;
           
-        let profileTemplate = fs.readFileSync('/app/assets/profile/profile.svg').toString();
-        profileTemplate = profileTemplate.replace(/{{USERNAME}}/g, this.encodeStr(discordUser.username.substr(0,15)+(discordUser.username.length>15?'...':'')));
-        profileTemplate = profileTemplate.replace(/{{PROFILE_TEXT}}/g, customStatus );
-        profileTemplate = profileTemplate.replace(/{{HEADER_COLOR}}/g, '190,31,97');
-        profileTemplate = profileTemplate.replace(/{{CC}}/g, await Card.count({where: {userId: user.id}}));
-        profileTemplate = profileTemplate.replace(/{{LVL}}/g, await user.level().currentLevel);
-        profileTemplate = profileTemplate.replace(/{{CUR_1}}/g, `${await user.primaryCurrency} ${CURRENCY_NAMES[1]}`);
-        profileTemplate = profileTemplate.replace(/{{CUR_2}}/g, `${await user.secondaryCurrency} ${CURRENCY_NAMES[2]}`);
-
         let userImage = discordUser.displayAvatarURL({format: 'png', size: 128}).split('webp')[0] + 'png';
 
         let slots = ['slotOne', 'slotTwo', 'slotThree', 'slotFour'];
@@ -104,7 +93,7 @@ module.exports = {
                 },
                 {
                     "type": "text",
-                    "text": this.encodeStr(discordUser.username.substr(0,15)+(discordUser.username.length>15?'...':'')),
+                    "text": discordUser.username.substr(0,15)+(discordUser.username.length>15?'...':''),
                     "fontSize": 32,
                     "x": 25,
                     "y": 20,
@@ -169,16 +158,5 @@ module.exports = {
         let { data } = await axios.post(`${process.env.JOSE_ENDPOINT}/jobs`, job);
         console.log("Fetched ", data);
         await interaction.editReply({ files: [data["path"]] });
-    },
-    encodeStr: function(str) {
-        let charMapping = {
-            '&': '&amp;',
-            '"': '&quot;',
-            '<': '&lt;',
-            '>': '&gt;'
-        };
-        return str.replace(/([\&"<>])/g, function(str, item) {
-            return charMapping[item];
-        });
     }
 }
