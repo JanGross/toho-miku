@@ -1,7 +1,4 @@
 require("dotenv").config();
-const sharp = require('sharp');
-const crypto = require('crypto');
-const fs = require('fs');
 const { Character } = require('../models');
 const axios = require('axios').default
 
@@ -14,7 +11,6 @@ const QualityColors = {
     6: {r: 255, g: 255, b: 0} //shiny
 }
 
-//TODO: Handle missing images
 module.exports = {
     name: "Rendering",
     renderCardStack: async function(cards) {
@@ -71,17 +67,7 @@ module.exports = {
             }
         });
 
-/*         if (!card.userId) {
-            return './assets/cards/card_cover.png';
-        } */
-        /**
-        let hash = crypto.createHash('md5').update(character.imageIdentifier + card.quality + (card.userId == 1 ? 'unclaimed' : 'claimed')).digest('hex');
-        //TODO: Add switch to turn off or bypass caching
-        if (fs.existsSync(`./assets/image_cache/${hash}.gif`)) {
-            return `./assets/image_cache/${hash}.gif`;
-        }
-        **/
-        console.log(`Rendering card or character ${character.name} ${character.imageIdentifier}`);
+        console.log(`Rendering card ${card.id} ${character.name} ${character.imageIdentifier}`);
         
         let characterImage = `${process.env.ASSET_URL}/cards/${character.imageIdentifier}`;
 
@@ -91,7 +77,6 @@ module.exports = {
             character.name = ' ';
         }
 
-        console.log("Character iomage ", characterImage);
         let job = {
             "type": "card",
             "size": {
@@ -132,6 +117,5 @@ module.exports = {
         let { data } = await axios.post(`${process.env.JOSE_ENDPOINT}/jobs`, job);
         console.log("Fetched ", data["path"]);
         return data["path"];
-
     }
 }
