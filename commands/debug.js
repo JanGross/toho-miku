@@ -1,7 +1,7 @@
 const { SlashCommandBuilder, ComponentType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { customAlphabet } = require("nanoid");
 const { Card, User, Wishlist, Character } = require("../models");
-const { UserUtils, CardUtils, GeneralUtils } = require("../util");
+const { UserUtils, CardUtils, GeneralUtils, Rendering } = require("../util");
 const { PATREON } = require("../config/constants");
 const stores = require("../stores");
 require('dotenv').config();
@@ -28,6 +28,7 @@ module.exports = {
                         { name: 'toggle_maintenance', value: 'toggle_maintenance' },
                         { name: 'store', value: 'store' },
                         { name: 'wishlist', value: 'wishlist' },
+                        { name: 'rendering', value: 'rendering' },
                         { name: 'patreon', value: 'patreon' }
                     )
                 )
@@ -181,6 +182,51 @@ module.exports = {
             
             let patreon = await UserUtils.getPatreonPerks(interaction.client, extUser ? extUser : user);
             interaction.channel.send(JSON.stringify(patreon));
+            break;
+        case "rendering":
+            const row = new ActionRowBuilder();
+            row.addComponents(
+				new ButtonBuilder()
+					.setCustomId(`testbatch`)
+					.setLabel(`Render test batch`)
+					.setStyle(ButtonStyle.Primary),
+			);
+            interaction.editReply({
+                content: `Jose endpoint: ${process.env.JOSE_ENDPOINT}\n Asset URL: ${process.env.ASSET_URL}`,
+                components: [row],
+                ephemeral: false
+            });
+            const filter = (m) => m.user.id === interaction.user.id;
+            const collector = interaction.channel.createMessageComponentCollector({ filter: filter, componentType: ComponentType.Button, time: 60000 });
+            collector.on('collect', async (i) => {
+                switch (i.customId) {
+                    case 'testbatch':
+                        i.deferUpdate();
+                        interaction.channel.send("Beep boop test batch of 5");
+                        let testCard = await Card.build({
+                            characterId: 0,
+                            userId: 1,
+                            identifier: "0xffff",
+                            quality: 1,
+                            printNr: 0,
+                            
+                        });
+                        let testCharacter = Character.build({
+                            id: 0,
+                            groupId: 0,
+                            name: "test",
+                            imageIdentifier: "azur-lane/akashi.png",
+                            enabled: true
+                        })
+                        for (let index = 0; index < 5; index++) {
+                            testCard.printNr = index;
+                            let render = await Rendering.renderCard(testCard, testCharacter).catch(function(error){interaction.channel.send(JSON.stringify(error))});
+                            await interaction.channel.send(render);
+                        }
+                        break;
+                }
+            });
+
             break;
         default:
             interaction.editReply({
