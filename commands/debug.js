@@ -220,7 +220,11 @@ module.exports = {
                         })
                         for (let index = 0; index < 5; index++) {
                             testCard.printNr = index;
-                            let render = await Rendering.renderCard(testCard, testCharacter).catch(function(error){interaction.channel.send(JSON.stringify(error))});
+                            let render = await Rendering.renderCard(testCard, testCharacter).catch(async function(error){
+                                await interaction.channel.send(JSON.stringify(error));
+                                await interaction.channel.send(JSON.stringify(error.response?.data));
+                                return;
+                            });
                             await interaction.channel.send(render);
                         }
                         break;
