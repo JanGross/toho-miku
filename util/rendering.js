@@ -118,8 +118,8 @@ module.exports = {
         if(process.env.NODE_ENV === "development") {
             debugElement = {
                 "type": "text",
-                "text": `Jose-Endpoint: ${process.env.JOSE_ENDPOINT}\nNode: %nodeid% \nPrint: ${card.printNr} uid: ${card.identifier}\n Serve-Mode: %servemode%`,
-                "fontSize": 25,
+                "text": `Jose-Endpoint: \n${process.env.JOSE_ENDPOINT}\nNode: \n%nodeid% \nPrint: ${card.printNr} uid: ${card.identifier}\n Serve-Mode: %servemode%\n TS:%timestamp%`,
+                "fontSize": 35,
                 "x": 0,
                 "y": 50,
                 "width": 600,
