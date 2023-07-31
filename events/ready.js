@@ -16,7 +16,7 @@ module.exports = {
         (async () => {
             try {
                 console.log("Registering commands...");
-                if(process.env.ENV === "production") {
+                if(process.env.NODE_ENV === "production") {
                     await rest.put(Routes.applicationCommands(CLIENT_ID), {body: commands });
                     await rest.put(Routes.applicationGuildCommands(CLIENT_ID, process.env.GUILD_ID), {body: [] }); //Clear Guild commands on prod
                     console.log("Global commands registered");
