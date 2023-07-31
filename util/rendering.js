@@ -60,12 +60,14 @@ module.exports = {
         return data["path"];
 
     },
-    renderCard: async function(card) {
-        const character = await Character.findOne({
-            where: {
-                id: card.characterId
-            }
-        });
+    renderCard: async function(card, character=null) {
+        if(!character) {
+            character = await Character.findOne({
+                where: {
+                    id: card.characterId
+                }
+            });
+        }
 
         console.log(`Rendering card ${card.id} ${character.name} ${character.imageIdentifier}`);
         
@@ -112,10 +114,24 @@ module.exports = {
                 }
             ]
         }
+
+        if(process.env.NODE_ENV === "development") {
+            debugElement = {
+                "type": "text",
+                "text": `Jose-Endpoint: ${process.env.JOSE_ENDPOINT}\nNode: %nodeid% \nPrint: ${card.printNr} uid: ${card.identifier}\n Serve-Mode: %servemode%`,
+                "fontSize": 25,
+                "x": 0,
+                "y": 50,
+                "width": 600,
+                "height": 800,
+                "horizontalAlignment": "center"
+            }
+            job.elements.push(debugElement)
+        }
         
-        console.log("Fetching ", );
+        console.log("Fetching ", JSON.stringify(job));
         let { data } = await axios.post(`${process.env.JOSE_ENDPOINT}/jobs`, job);
-        console.log("Fetched ", data["path"]);
+        console.log("Fetched ", JSON.stringify(data));
         return data["path"];
     }
 }
