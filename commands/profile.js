@@ -1,7 +1,7 @@
 require("dotenv").config();
 const { SlashCommandBuilder } = require("discord.js");
 const { Card } = require("../models");
-const { UserUtils, Rendering } = require("../util");
+const { UserUtils, Rendering, GeneralUtils } = require("../util");
 const axios = require("axios");
 const { CURRENCY_NAMES } = require("../config/constants");
 
@@ -103,7 +103,7 @@ module.exports = {
                 },
                 {
                     "type": "text",
-                    "text": `CC: ${await Card.count({where: {userId: user.id}})}`,
+                    "text": `CC: ${GeneralUtils.formatNumber(await Card.count({where: {userId: user.id}}))}`,
                     "fontSize": 30,
                     "x": 550,
                     "y": 20,
@@ -123,31 +123,31 @@ module.exports = {
                 },
                 {
                     "type": "text",
-                    "text": `${await user.primaryCurrency} ${CURRENCY_NAMES[1]}`,
+                    "text": `${GeneralUtils.formatNumber(await user.primaryCurrency)} ${CURRENCY_NAMES[1]}`,
                     "fontSize": 30,
                     "x": 850,
                     "y": 20,
-                    "width": 150,
+                    "width": 170,
                     "height": 30,
                     "horizontalAlignment": "left"
                 },
                 {
                     "type": "text",
-                    "text": `${await user.secondaryCurrency} ${CURRENCY_NAMES[2]}`,
+                    "text": `${await GeneralUtils.formatNumber(user.secondaryCurrency)} ${CURRENCY_NAMES[2]}`,
                     "fontSize": 30,
-                    "x": 1000,
+                    "x": 1020,
                     "y": 20,
-                    "width": 150,
+                    "width": 170,
                     "height": 30,
                     "horizontalAlignment": "left"
                 },
                 {
                     "type": "text",
                     "text": customStatus,
-                    "fontSize": 30,
+                    "fontSize": 25,
                     "x": 550,
-                    "y": 55,
-                    "width": 600,
+                    "y": 65,
+                    "width": 625,
                     "height": 300,
                     "horizontalAlignment": "left"
                 }
