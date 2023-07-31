@@ -21,6 +21,7 @@ module.exports = {
                     await rest.put(Routes.applicationGuildCommands(CLIENT_ID, process.env.GUILD_ID), {body: [] }); //Clear Guild commands on prod
                     console.log("Global commands registered");
                 } else {
+                    await rest.put(Routes.applicationCommands(CLIENT_ID), {body: [] }); //Clear global commands on dev
                     await rest.put(Routes.applicationGuildCommands(CLIENT_ID, process.env.GUILD_ID), {body: commands });
                     console.log("Local commands registered");
                 }
