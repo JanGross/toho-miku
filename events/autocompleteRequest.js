@@ -40,6 +40,12 @@ module.exports = {
             }
         }
 
+        if (interaction.commandName === 'missing') {
+
+            choices = (await SearchUtils.findByName(Group, focusedOption.value))["choices"];
+
+        }
+
         if (interaction.commandName === 'wishlist') {
             choices = (await SearchUtils.findByName(Character, focusedOption.value))["choices"];
         }
