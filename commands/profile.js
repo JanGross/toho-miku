@@ -38,9 +38,9 @@ module.exports = {
             if (card) {
                 console.log(`Iterating card ${card.id}`);
                 let cardImage = await Rendering.renderCard(card);
-                renderedCards.push(cardImage);
+                renderedCards[slot] = cardImage;
             } else {
-                renderedCards.push(`${process.env.ASSET_URL}/cards/card_cover.png`);
+                renderedCards[slot] = `${process.env.ASSET_URL}/cards/card_cover.png`;
             }
         }));
 
@@ -53,7 +53,7 @@ module.exports = {
             "elements": [
                 { 
                     "type": "image",
-                    "asset": `${renderedCards[0]}`,
+                    "asset": `${renderedCards['slotOne']}`,
                     "x": 25,
                     "y": 85,
                     "width": 300,
@@ -61,7 +61,7 @@ module.exports = {
                 },
                 { 
                     "type": "image",
-                    "asset": `${renderedCards[1]}`,
+                    "asset": `${renderedCards['slotTwo']}`,
                     "x": 375,
                     "y": 310,
                     "width": 175,
@@ -69,7 +69,7 @@ module.exports = {
                 },
                 { 
                     "type": "image",
-                    "asset": `${renderedCards[2]}`,
+                    "asset": `${renderedCards['slotThree']}`,
                     "x": 560,
                     "y": 310,
                     "width": 175,
@@ -77,7 +77,7 @@ module.exports = {
                 },
                 { 
                     "type": "image",
-                    "asset": `${renderedCards[3]}`,
+                    "asset": `${renderedCards['slotFour']}`,
                     "x": 745,
                     "y": 310,
                     "width": 175,
@@ -155,6 +155,9 @@ module.exports = {
         }
         
         console.log("Fetching ", );
+        if(process.env.NODE_ENV === "development") {
+            await interaction.channel.send(`\`\`\`${JSON.stringify(job)}\`\`\``);
+        }
         let { data } = await axios.post(`${process.env.JOSE_ENDPOINT}/jobs`, job);
         console.log("Fetched ", data);
         await interaction.editReply({ files: [data["path"]] });
