@@ -24,7 +24,7 @@ module.exports = {
 
         let discordUser = interaction.options.getUser("user") ? interaction.options.getUser("user") : interaction.member.user;
         let user = await UserUtils.getUserByDiscordId(discordUser.id);
-
+        let patreon = await UserUtils.getPatreonPerks(interaction.client, user);
         let profile = await user.getProfile();
 
         let customStatus = profile.customStatus;
@@ -154,6 +154,18 @@ module.exports = {
             ]
         }
         
+        if (patreon.perks?.['custom_bg'] && profile.customBackground) {
+            job.elements.unshift(
+                { 
+                    "type": "image",
+                    "asset": profile.customBackground,
+                    "x": 0,
+                    "y": 0,
+                    "width": 1200,
+                    "height": 600
+                }
+            );
+        }
         console.log("Fetching ", );
         if(process.env.NODE_ENV === "development") {
             await interaction.channel.send(`\`\`\`${JSON.stringify(job)}\`\`\``);

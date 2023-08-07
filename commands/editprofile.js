@@ -1,6 +1,6 @@
-const { SlashCommandBuilder, ComponentType, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder } = require("discord.js");
+const { SlashCommandBuilder, ComponentType, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle, ModalBuilder, Attachment } = require("discord.js");
 const { Card, User, Character } = require("../models");
-const { UserUtils, ReplyUtils } = require("../util");
+const { UserUtils, ReplyUtils, GeneralUtils } = require("../util");
 
 const pageSize = 8;
 
@@ -8,12 +8,18 @@ const pageSize = 8;
 module.exports = {
     data: new SlashCommandBuilder()
             .setName("editprofile")
-            .setDescription("Edit your profile"),
+            .setDescription("Edit your profile")
+            .addAttachmentOption((option) =>
+                option
+                    .setName("attachement")
+                    .setDescription("Attachement to be used")
+                    .setRequired(false)
+                ),
     permissionLevel: 0,
     async execute(interaction) {
         await interaction.deferReply();
         let user = await UserUtils.getUserByDiscordId(interaction.member.id);
-
+        let patreon = await UserUtils.getPatreonPerks(interaction.client, user);
         let profile = await user.getProfile();
         
         
@@ -30,6 +36,15 @@ module.exports = {
                 .setCustomId('editShowcase')
                 .setStyle(ButtonStyle.Primary)
         );
+
+        if (patreon.perks?.["custom_bg"] === true && interaction.options.getAttachment("attachement")) {
+            mainRow.addComponents(
+                new ButtonBuilder()
+                .setLabel('Set attachment as custom background')
+                .setCustomId('setCustomBg')
+                .setStyle(ButtonStyle.Primary)
+            );
+        }
 
         const pingRow = new ActionRowBuilder();
         pingRow.addComponents(
@@ -61,6 +76,19 @@ module.exports = {
                     break;
                 case 'editShowcase':
                     await this.openShowcaseModal(i, user, profile);
+                    break;
+                case 'setCustomBg':
+                    await i.deferReply();
+                    let allowedContentTypes = [ "image/png", "image/jpeg" ];
+                    let image = interaction.options.getAttachment("attachement");
+                    if (!allowedContentTypes.includes(image.contentType)) {
+                        await i.editReply({ content: "An invalid image has been attached. Allowed are .png and .jpeg", ephemeral: true });
+                        return;
+                    }
+                    await GeneralUtils.downloadFile(image.url, `/app/assets/userdata/profiles/${image.id}_${image.name}`);
+                    profile.customBackground = `${process.env.ASSET_URL}/userdata/profiles/${image.id}_${image.name}`;  
+                    await profile.save();
+                    await i.editReply('Custom profile background has been set!');
                     break;
                 case 'toggle-wishlist-ping':
                     await i.deferUpdate();

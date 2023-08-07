@@ -101,7 +101,8 @@ const PATREON = {
                 wishlist: 15,
                 currency: 1.25,
                 daily: 1.5
-            }
+            },
+            custom_bg: true
         },
         4 : {
             modifiers: {
@@ -110,7 +111,8 @@ const PATREON = {
                 wishlist: 25,
                 currency: 1.75,
                 daily: 2
-            }
+            },
+            custom_bg: true
         },
         5 : {
             modifiers: {
@@ -119,7 +121,8 @@ const PATREON = {
                 wishlist: 45,
                 currency: 2,
                 daily: 4
-            }
+            },
+            custom_bg: true
         }
     }
 }

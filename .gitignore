@@ -6,6 +6,7 @@
 assets/image_cache
 assets/cards
 assets/import
+assets/userdata
 
 ### Visual Studio Code ###
 .vscode 
