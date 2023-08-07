@@ -1,6 +1,8 @@
 const { Bot } = require("../models");
 const crypto = require("crypto");
 const { ReactionUserManager } = require("discord.js");
+const axios = require("axios");
+const fs = require("fs");
 
 module.exports = {
     name: "GeneralUtils",
@@ -35,5 +37,10 @@ module.exports = {
         }
       
         return num;
-    }
+    },
+
+    downloadFile: async function(url, path) {
+        let imageBuffer = await axios.get(url, { responseType: 'arraybuffer' });
+        fs.writeFileSync(path, imageBuffer.data);
+    },
 }
