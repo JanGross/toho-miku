@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
   Profile.init({
     userId: DataTypes.INTEGER,
     customStatus: DataTypes.STRING,
+    customBackground: DataTypes.STRING,
     slotOne: DataTypes.INTEGER,
     slotTwo: DataTypes.INTEGER,
     slotThree: DataTypes.INTEGER,
