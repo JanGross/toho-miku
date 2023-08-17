@@ -70,8 +70,11 @@ module.exports = {
             interaction.editReply({ content: "Card not found" });
             return;
         }
-        let cardImage = await Rendering.renderCard(card);
-
+        let cardImage = await Rendering.renderCard(card).catch(async err => {
+            await interaction.channel.send(`Uooh an error! ${err.response?.status} ${err.response?.statusText} \n ${err.response?.data.message} \n ${err.response?.data.jobId}`);
+        });
+        if (!cardImage) { return; }
+        
         let description = "";
         //Add a new line after every 4th (long) word or after a full stop
         let words = card.Character.description.split(" ");

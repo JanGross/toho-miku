@@ -37,7 +37,10 @@ module.exports = {
             let card = await Card.findOne({ where: { id: profile[slot], burned: false } });
             if (card) {
                 console.log(`Iterating card ${card.id}`);
-                let cardImage = await Rendering.renderCard(card);
+                let cardImage = await Rendering.renderCard(card).catch(async err => {
+                    await interaction.channel.send(`Uooh an error! ${err.response?.status} ${err.response?.statusText} \n ${err.response?.data.message} \n ${err.response?.data.jobId}`);
+                });
+                if (!cardImage) { return; }
                 renderedCards[slot] = cardImage;
             } else {
                 renderedCards[slot] = `${process.env.ASSET_URL}/cards/card_cover.png`;

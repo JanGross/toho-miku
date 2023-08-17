@@ -80,7 +80,11 @@ module.exports = {
         cards.sort((a, b) => a.characterId - b.characterId);
         
         const row = new ActionRowBuilder();
-        let deckImage = await Rendering.renderCardStack(cards);
+        let deckImage = await Rendering.renderCardStack(cards).catch(async err => {
+            await interaction.channel.send(`Uooh an error! ${err.response?.status} ${err.response?.statusText} \n ${err.response?.data.message} \n ${err.response?.data.jobId}`);
+        });
+        if (!deckImage) { return; }
+        
         let notableProps = [];
         let pings = [];
         for (let i = 0; i < cards.length; i++) {
@@ -219,7 +223,10 @@ module.exports = {
             console.log(`Collected ${collected.size} interactions.`);
 
             
-            let deckImage = await Rendering.renderCardStack(cards);
+            let deckImage = await Rendering.renderCardStack(cards).catch(async err => {
+                await interaction.channel.send(`Uooh an error! ${err.response?.status} ${err.response?.statusText} \n ${err.response?.data.message} \n ${err.response?.data.jobId}`);
+            });
+            if (!deckImage){ return; }
             message.edit({ components: [], files: [new AttachmentBuilder(deckImage)] });
         });
         
