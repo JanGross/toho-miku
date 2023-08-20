@@ -1,8 +1,9 @@
 const { SlashCommandBuilder, ComponentType, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const { customAlphabet } = require("nanoid");
-const { Card, User, Wishlist, Character } = require("../models");
+const { customAlphabet, random } = require("nanoid");
+const { Card, User, Wishlist, Character, sequelize } = require("../models");
 const { UserUtils, CardUtils, GeneralUtils, Rendering } = require("../util");
 const { PATREON } = require("../config/constants");
+const axios = require('axios').default
 const stores = require("../stores");
 require('dotenv').config();
 
@@ -202,10 +203,10 @@ module.exports = {
                 switch (i.customId) {
                     case 'testbatch':
                         i.deferUpdate();
-                        interaction.channel.send("Beep boop test batch of 5");
+                        interaction.channel.send("Beep boop fetching test renders");
                         let testCard = await Card.build({
-                            characterId: 0,
-                            userId: 1,
+                            characterId: 1,
+                            userId: Math.floor(Math.random() * 10),
                             identifier: "0xffff",
                             quality: 1,
                             printNr: 0,
@@ -218,15 +219,37 @@ module.exports = {
                             imageIdentifier: "azur-lane/akashi.png",
                             enabled: true
                         })
-                        for (let index = 0; index < 5; index++) {
-                            testCard.printNr = index;
-                            let render = await Rendering.renderCard(testCard, testCharacter).catch(async function(error){
-                                await interaction.channel.send(JSON.stringify(error));
-                                await interaction.channel.send(JSON.stringify(error.response?.data));
-                                return;
-                            });
-                            await interaction.channel.send(render);
-                        }
+
+                        let testCards = [ { ...testCard},{ ...testCard},{ ...testCard},{ ...testCard},{ ...testCard}, { ...testCard},{ ...testCard},{ ...testCard},{ ...testCard},{ ...testCard} ];
+                        let startTime = Date.now();
+                        let renderedStack = await Rendering.renderCardStack([testCard, testCard, testCard]);
+                        let execTime = Date.now() - startTime;
+                        await interaction.channel.send(renderedStack);
+                        await interaction.channel.send(`Stack rendering took ${execTime} ms`);
+                        
+                        
+                        let total = 0;
+                        startTime = Date.now()
+                        await Promise.all(testCards.map(async card => {
+                            console.log(`Iterating card `);
+                            card.characterId = (await Character.findAll({where: {enabled: true},order: sequelize.random(),limit: 1}))[0].id;
+                            card.id = 0;
+                            card.identifier = CardUtils.generateIdentifier();
+                            card.userId = 1;
+                            let startTime = Date.now();
+                            card['render'] = await Rendering.renderCard(card);
+                            let execTime = Date.now() - startTime;
+                            total += execTime;
+                            card['timing'] = `${card.identifier} Card rendering took ${execTime} ms`;
+                        }));
+                        let toatalExecTime = Date.now() - startTime;
+                        
+                        await interaction.channel.send(testCards.map(card => {return `${card['identifier']} ${card['render']}` }).join('\n'));
+                        await interaction.channel.send(testCards.map(card => {return card['timing'] }).join('\n'))
+                        
+                        let joseStats = (await axios.get(`${process.env.JOSE_ENDPOINT}/status`)).data;
+                        await interaction.channel.send(`Active Nodes: ${joseStats.nodes.count} Queued Jobs: ${joseStats.jobs.queued.count}`);
+                        await interaction.channel.send(`Total time for ${testCards.length} Cards: ${toatalExecTime}\nAverage time per card: ${total / testCards.length}`);
                         break;
                 }
             });
