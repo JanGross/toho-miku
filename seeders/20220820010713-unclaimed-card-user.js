@@ -7,6 +7,9 @@ module.exports = {
       discordId: '123456789',
       active: false,
       privacy: 0,
+      nextDropReset: new Date(),
+      nextClaimReset: new Date(),
+      nextDaily: new Date(),
       createdAt: new Date(),
       updatedAt: new Date()
     }]);

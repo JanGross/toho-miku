@@ -6,8 +6,9 @@ module.exports = {
       id: 1,
       maintenance: 0,
       adminIDs: '["222457277708369928"]',
-      pullTimeout: 300000,
-      dropTimeout: 900000
+      claimTimeout: 300000,
+      dropTimeout: 900000,
+      patreonTierRoles: '{"1083018874263453868":1,"1083018984921759744":2,"1083019067184664607":3,"1083019116111216702":4,"1084519566354423918":5}'
     }]);
   },
 
